@@ -1,3 +1,4 @@
+# coding=utf-8
 # Copyright 2015 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,6 +25,7 @@ import random
 import numpy as np
 from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
+from tensorflow.contrib.legacy_seq2seq.python.ops import seq2seq
 
 #from tensorflow.models.rnn.translate import data_utils
 #fixes  File "execute.py", line 31, in <module>
@@ -41,7 +43,52 @@ class Seq2SeqModel(object):
 
   This class implements a multi-layer recurrent neural network as encoder,
   and an attention-based decoder. This is the same as the model described in
-  this paper: http://arxiv.org/abs/1412.7449 - please look there for details,
+  this paper: h/usr/bin/python2.7 /home/nyh/tools/pycharm-2017.2/helpers/pycharm/_jb_unittest_runner.py --path /home/nyh/work/workspace/tensorflow/tensorflow/tensorflow/contrib/legacy_seq2seq/python/kernel_tests/seq2seq_test.py
+Testing started at 下午2:39 ...
+Launching unittests with arguments python -m unittest discover -s /home/nyh/work/workspace/tensorflow/tensorflow/tensorflow/contrib/legacy_seq2seq/python/kernel_tests -p seq2seq_test.py -t /home/nyh/work/workspace/tensorflow/tensorflow/tensorflow/contrib/legacy_seq2seq/python/kernel_tests in /home/nyh/work/workspace/tensorflow/tensorflow/tensorflow/contrib/legacy_seq2seq/python/kernel_tests
+
+Error
+Traceback (most recent call last):
+  File "/usr/lib/python2.7/unittest/case.py", line 329, in run
+    testMethod()
+  File "/usr/lib/python2.7/unittest/loader.py", line 32, in testFailure
+    raise exception
+ImportError: Failed to import test module: seq2seq_test
+Traceback (most recent call last):
+  File "/usr/lib/python2.7/unittest/loader.py", line 254, in _find_tests
+    module = self._get_module_from_name(name)
+  File "/usr/lib/python2.7/unittest/loader.py", line 232, in _get_module_from_name
+    __import__(name)
+  File "/home/nyh/work/workspace/tensorflow/tensorflow/tensorflow/contrib/legacy_seq2seq/python/kernel_tests/seq2seq_test.py", line 28, in <module>
+    from tensorflow.python.framework import constant_op
+  File "/home/nyh/work/workspace/tensorflow/tensorflow/tensorflow/__init__.py", line 24, in <module>
+    from tensorflow.python import *
+  File "/home/nyh/work/workspace/tensorflow/tensorflow/tensorflow/python/__init__.py", line 49, in <module>
+    from tensorflow.python import pywrap_tensorflow
+  File "/home/nyh/work/workspace/tensorflow/tensorflow/tensorflow/python/pywrap_tensorflow.py", line 52, in <module>
+    raise ImportError(msg)
+ImportError: Traceback (most recent call last):
+  File "/home/nyh/work/workspace/tensorflow/tensorflow/tensorflow/python/pywrap_tensorflow.py", line 41, in <module>
+    from tensorflow.python.pywrap_tensorflow_internal import *
+ImportError: No module named pywrap_tensorflow_internal
+
+
+Failed to load the native TensorFlow runtime.
+
+See https://www.tensorflow.org/install/install_sources#common_installation_problems
+
+for some common reasons and solutions.  Include the entire stack trace
+above this error message when asking for help.
+
+
+
+
+Ran 1 test in 0.002s
+
+FAILED (errors=1)
+
+Process finished with exit code 1
+ttp://arxiv.org/abs/1412.7449 - please look there for details,
   or into the seq2seq library for complete model implementation.
   This class also allows to use GRU cells in addition to LSTM cells, and
   sampled softmax to handle large output vocabulary size. A single-layer
@@ -96,23 +143,23 @@ class Seq2SeqModel(object):
       b = tf.get_variable("proj_b", [self.target_vocab_size])
       output_projection = (w, b)
 
-      def sampled_loss(inputs, labels):
+      def sampled_loss(logits, labels):
         labels = tf.reshape(labels, [-1, 1])
-        return tf.nn.sampled_softmax_loss(w_t, b, inputs, labels, num_samples,
+        return tf.nn.sampled_softmax_loss(w_t, b, labels, logits, num_samples,
                 self.target_vocab_size)
       softmax_loss_function = sampled_loss
 
     # Create the internal multi-layer cell for our RNN.
-    single_cell = tf.nn.rnn_cell.GRUCell(size)
+    single_cell = tf.contrib.rnn.GRUCell(size)
     if use_lstm:
-      single_cell = tf.nn.rnn_cell.BasicLSTMCell(size)
+      single_cell = tf.contrib.rnn.BasicLSTMCell(size)
     cell = single_cell
     if num_layers > 1:
-      cell = tf.nn.rnn_cell.MultiRNNCell([single_cell] * num_layers)
+      cell = tf.contrib.rnn.MultiRNNCell([single_cell] * num_layers)
 
     # The seq2seq function: we use embedding for the input and attention.
     def seq2seq_f(encoder_inputs, decoder_inputs, do_decode):
-      return tf.nn.seq2seq.embedding_attention_seq2seq(
+      return seq2seq.embedding_attention_seq2seq(
           encoder_inputs, decoder_inputs, cell,
           num_encoder_symbols=source_vocab_size,
           num_decoder_symbols=target_vocab_size,
@@ -151,9 +198,12 @@ class Seq2SeqModel(object):
               for output in self.outputs[b]
           ]
     else:
-      self.outputs, self.losses = tf.nn.seq2seq.model_with_buckets(
-          self.encoder_inputs, self.decoder_inputs, targets,
-          self.target_weights, buckets,
+      self.outputs, self.losses = seq2seq.model_with_buckets(
+          self.encoder_inputs,
+          self.decoder_inputs,
+          targets,
+          self.target_weights,
+          buckets,
           lambda x, y: seq2seq_f(x, y, False),
           softmax_loss_function=softmax_loss_function)
 
