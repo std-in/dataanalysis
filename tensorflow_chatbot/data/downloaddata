@@ -1,0 +1,9 @@
+wget http://www.mpi-sws.org/~cristian/data/cornell_movie_dialogs_corpus.zip
+
+In the C:\Users\Sinclair\Desktop\tensorflow_chatbot-master\ folder, make a new folder named "data".
+(or wherever your tensorflow_chatbot folder is)
+
+In the new "data" folder, take all the *.txt files from the Cornell training material and dump them in.
+
+Then you need to grab the 'prepare_data.py' file from https://github.com/suriyadeepan/datasets.git, which is in the 'datasets/seq2seq/cornell_movie_corpus/scripts' directory and also add that to the 'data' folder and run it. That should automagically make the files you're in need of in the folder it's supposed to be in.
+
