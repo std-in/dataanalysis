@@ -1,4 +1,3 @@
-# coding=utf-8
 # Copyright 2015 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,17 +24,8 @@ import random
 import numpy as np
 from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
-from tensorflow.contrib.legacy_seq2seq.python.ops import seq2seq
 
-#from tensorflow.models.rnn.translate import data_utils
-#fixes  File "execute.py", line 31, in <module>
-    #import seq2seq_model
-  #File "C:\PYTHONCODE\Tensorflow\chatbot\tensorflow_chatbot\seq2seq_model.py", l
-#ine 28, in <module>
-    #from tensorflow.models.rnn.translate import data_utils
-#ModuleNotFoundError: No module named 'tensorflow.models'
 import data_utils
-
 
 
 class Seq2SeqModel(object):
@@ -43,52 +33,7 @@ class Seq2SeqModel(object):
 
   This class implements a multi-layer recurrent neural network as encoder,
   and an attention-based decoder. This is the same as the model described in
-  this paper: h/usr/bin/python2.7 /home/nyh/tools/pycharm-2017.2/helpers/pycharm/_jb_unittest_runner.py --path /home/nyh/work/workspace/tensorflow/tensorflow/tensorflow/contrib/legacy_seq2seq/python/kernel_tests/seq2seq_test.py
-Testing started at 下午2:39 ...
-Launching unittests with arguments python -m unittest discover -s /home/nyh/work/workspace/tensorflow/tensorflow/tensorflow/contrib/legacy_seq2seq/python/kernel_tests -p seq2seq_test.py -t /home/nyh/work/workspace/tensorflow/tensorflow/tensorflow/contrib/legacy_seq2seq/python/kernel_tests in /home/nyh/work/workspace/tensorflow/tensorflow/tensorflow/contrib/legacy_seq2seq/python/kernel_tests
-
-Error
-Traceback (most recent call last):
-  File "/usr/lib/python2.7/unittest/case.py", line 329, in run
-    testMethod()
-  File "/usr/lib/python2.7/unittest/loader.py", line 32, in testFailure
-    raise exception
-ImportError: Failed to import test module: seq2seq_test
-Traceback (most recent call last):
-  File "/usr/lib/python2.7/unittest/loader.py", line 254, in _find_tests
-    module = self._get_module_from_name(name)
-  File "/usr/lib/python2.7/unittest/loader.py", line 232, in _get_module_from_name
-    __import__(name)
-  File "/home/nyh/work/workspace/tensorflow/tensorflow/tensorflow/contrib/legacy_seq2seq/python/kernel_tests/seq2seq_test.py", line 28, in <module>
-    from tensorflow.python.framework import constant_op
-  File "/home/nyh/work/workspace/tensorflow/tensorflow/tensorflow/__init__.py", line 24, in <module>
-    from tensorflow.python import *
-  File "/home/nyh/work/workspace/tensorflow/tensorflow/tensorflow/python/__init__.py", line 49, in <module>
-    from tensorflow.python import pywrap_tensorflow
-  File "/home/nyh/work/workspace/tensorflow/tensorflow/tensorflow/python/pywrap_tensorflow.py", line 52, in <module>
-    raise ImportError(msg)
-ImportError: Traceback (most recent call last):
-  File "/home/nyh/work/workspace/tensorflow/tensorflow/tensorflow/python/pywrap_tensorflow.py", line 41, in <module>
-    from tensorflow.python.pywrap_tensorflow_internal import *
-ImportError: No module named pywrap_tensorflow_internal
-
-
-Failed to load the native TensorFlow runtime.
-
-See https://www.tensorflow.org/install/install_sources#common_installation_problems
-
-for some common reasons and solutions.  Include the entire stack trace
-above this error message when asking for help.
-
-
-
-
-Ran 1 test in 0.002s
-
-FAILED (errors=1)
-
-Process finished with exit code 1
-ttp://arxiv.org/abs/1412.7449 - please look there for details,
+  this paper: http://arxiv.org/abs/1412.7449 - please look there for details,
   or into the seq2seq library for complete model implementation.
   This class also allows to use GRU cells in addition to LSTM cells, and
   sampled softmax to handle large output vocabulary size. A single-layer
@@ -98,10 +43,20 @@ ttp://arxiv.org/abs/1412.7449 - please look there for details,
     http://arxiv.org/abs/1412.2007
   """
 
-  def __init__(self, source_vocab_size, target_vocab_size, buckets, size,
-               num_layers, max_gradient_norm, batch_size, learning_rate,
-               learning_rate_decay_factor, use_lstm=False,
-               num_samples=512, forward_only=False):
+  def __init__(self,
+               source_vocab_size,
+               target_vocab_size,
+               buckets,
+               size,
+               num_layers,
+               max_gradient_norm,
+               batch_size,
+               learning_rate,
+               learning_rate_decay_factor,
+               use_lstm=False,
+               num_samples=512,
+               forward_only=False,
+               dtype=tf.float32):
     """Create the model.
 
     Args:
@@ -123,12 +78,14 @@ ttp://arxiv.org/abs/1412.7449 - please look there for details,
       use_lstm: if true, we use LSTM cells instead of GRU cells.
       num_samples: number of samples for sampled softmax.
       forward_only: if set, we do not construct the backward pass in the model.
+      dtype: the data type to use to store internal variables.
     """
     self.source_vocab_size = source_vocab_size
     self.target_vocab_size = target_vocab_size
     self.buckets = buckets
     self.batch_size = batch_size
-    self.learning_rate = tf.Variable(float(learning_rate), trainable=False)
+    self.learning_rate = tf.Variable(
+        float(learning_rate), trainable=False, dtype=dtype)
     self.learning_rate_decay_op = self.learning_rate.assign(
         self.learning_rate * learning_rate_decay_factor)
     self.global_step = tf.Variable(0, trainable=False)
@@ -138,34 +95,54 @@ ttp://arxiv.org/abs/1412.7449 - please look there for details,
     softmax_loss_function = None
     # Sampled softmax only makes sense if we sample less than vocabulary size.
     if num_samples > 0 and num_samples < self.target_vocab_size:
-      w = tf.get_variable("proj_w", [size, self.target_vocab_size])
-      w_t = tf.transpose(w)
-      b = tf.get_variable("proj_b", [self.target_vocab_size])
+      w_t = tf.get_variable("proj_w", [self.target_vocab_size, size], dtype=dtype)
+      w = tf.transpose(w_t)
+      b = tf.get_variable("proj_b", [self.target_vocab_size], dtype=dtype)
       output_projection = (w, b)
 
-      def sampled_loss(logits, labels):
+      def sampled_loss(labels, logits):
         labels = tf.reshape(labels, [-1, 1])
-        return tf.nn.sampled_softmax_loss(w_t, b, labels, logits, num_samples,
-                self.target_vocab_size)
+        # We need to compute the sampled_softmax_loss using 32bit floats to
+        # avoid numerical instabilities.
+        local_w_t = tf.cast(w_t, tf.float32)
+        local_b = tf.cast(b, tf.float32)
+        local_inputs = tf.cast(logits, tf.float32)
+        return tf.cast(
+            tf.nn.sampled_softmax_loss(
+                weights=local_w_t,
+                biases=local_b,
+                labels=labels,
+                inputs=local_inputs,
+                num_sampled=num_samples,
+                num_classes=self.target_vocab_size),
+            dtype)
       softmax_loss_function = sampled_loss
 
-    # Create the internal multi-layer cell for our RNN.
-    single_cell = tf.contrib.rnn.GRUCell(size)
-    if use_lstm:
-      single_cell = tf.contrib.rnn.BasicLSTMCell(size)
-    cell = single_cell
-    if num_layers > 1:
-      cell = tf.contrib.rnn.MultiRNNCell([single_cell] * num_layers)
 
     # The seq2seq function: we use embedding for the input and attention.
     def seq2seq_f(encoder_inputs, decoder_inputs, do_decode):
-      return seq2seq.embedding_attention_seq2seq(
-          encoder_inputs, decoder_inputs, cell,
+
+      # Create the internal multi-layer cell for our RNN.
+      def single_cell():
+        return tf.contrib.rnn.GRUCell(size)
+
+      if use_lstm:
+        def single_cell():
+          return tf.contrib.rnn.BasicLSTMCell(size)
+      cell = single_cell()
+      if num_layers > 1:
+        cell = tf.contrib.rnn.MultiRNNCell([single_cell() for _ in range(num_layers)])
+
+      return tf.contrib.legacy_seq2seq.embedding_attention_seq2seq(
+          encoder_inputs,
+          decoder_inputs,
+          cell,
           num_encoder_symbols=source_vocab_size,
           num_decoder_symbols=target_vocab_size,
           embedding_size=size,
           output_projection=output_projection,
-          feed_previous=do_decode)
+          feed_previous=do_decode,
+          dtype=dtype)
 
     # Feeds for inputs.
     self.encoder_inputs = []
@@ -177,7 +154,7 @@ ttp://arxiv.org/abs/1412.7449 - please look there for details,
     for i in xrange(buckets[-1][1] + 1):
       self.decoder_inputs.append(tf.placeholder(tf.int32, shape=[None],
                                                 name="decoder{0}".format(i)))
-      self.target_weights.append(tf.placeholder(tf.float32, shape=[None],
+      self.target_weights.append(tf.placeholder(dtype, shape=[None],
                                                 name="weight{0}".format(i)))
 
     # Our targets are decoder inputs shifted by one.
@@ -186,7 +163,7 @@ ttp://arxiv.org/abs/1412.7449 - please look there for details,
 
     # Training outputs and losses.
     if forward_only:
-      self.outputs, self.losses = tf.nn.seq2seq.model_with_buckets(
+      self.outputs, self.losses = tf.contrib.legacy_seq2seq.model_with_buckets(
           self.encoder_inputs, self.decoder_inputs, targets,
           self.target_weights, buckets, lambda x, y: seq2seq_f(x, y, True),
           softmax_loss_function=softmax_loss_function)
@@ -198,12 +175,9 @@ ttp://arxiv.org/abs/1412.7449 - please look there for details,
               for output in self.outputs[b]
           ]
     else:
-      self.outputs, self.losses = seq2seq.model_with_buckets(
-          self.encoder_inputs,
-          self.decoder_inputs,
-          targets,
-          self.target_weights,
-          buckets,
+      self.outputs, self.losses = tf.contrib.legacy_seq2seq.model_with_buckets(
+          self.encoder_inputs, self.decoder_inputs, targets,
+          self.target_weights, buckets,
           lambda x, y: seq2seq_f(x, y, False),
           softmax_loss_function=softmax_loss_function)
 
@@ -221,7 +195,7 @@ ttp://arxiv.org/abs/1412.7449 - please look there for details,
         self.updates.append(opt.apply_gradients(
             zip(clipped_gradients, params), global_step=self.global_step))
 
-    self.saver = tf.train.Saver(tf.all_variables())
+    self.saver = tf.train.Saver(tf.global_variables())
 
   def step(self, session, encoder_inputs, decoder_inputs, target_weights,
            bucket_id, forward_only):
