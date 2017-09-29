@@ -123,6 +123,12 @@ def train():
         print('bucket {} 中有数据 {} 条'.format(i, bucket_size))
     total_size = sum(bucket_sizes)
     print('共有数据 {} 条'.format(total_size))
+
+    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.66)
+    config = tf.ConfigProto(gpu_options=gpu_options)
+    # 防止 out of memory
+    config.gpu_options.allocator_type = 'BFC'
+
     # 开始建模与训练
     with tf.Session() as sess:
         #　构建模型

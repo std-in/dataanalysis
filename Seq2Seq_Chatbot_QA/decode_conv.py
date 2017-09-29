@@ -91,7 +91,7 @@ def main(file_path):
     conn.commit()
 
 if __name__ == '__main__':
-    file_path = 'dgk_shooter_min.conv'
+    file_path = 'db/dgk_shooter_min.conv'
     if len(sys.argv) == 2:
         file_path = sys.argv[1]
     if not os.path.exists(file_path):
