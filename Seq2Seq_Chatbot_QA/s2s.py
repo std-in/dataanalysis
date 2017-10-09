@@ -13,9 +13,11 @@ import tensorflow as tf
 import data_utils
 import s2s_model
 
+# 感觉说得很零碎，总结起来的话，tf.app.flags.DEFINE_xxx()就是添加命令行的optional argument（可选参数），
+# 而tf.app.flags.FLAGS可以从对应的命令行参数取出参数。
 tf.app.flags.DEFINE_float(
     'learning_rate',
-    0.0003,
+    0.01,
     '学习率'
 )
 tf.app.flags.DEFINE_float(

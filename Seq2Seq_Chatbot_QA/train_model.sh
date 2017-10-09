@@ -1,6 +1,6 @@
 #!/bin/bash
 
-test_arg="true"
+test_arg="false"
 bleu_arg="-1"
 if [ ! -z $1 ]
 then
@@ -18,11 +18,11 @@ then
 fi
 
 python3 s2s.py \
---size 512 \
---num_layers 3 \
+--size 1024 \
+--num_layers 2 \
 --num_epoch 5 \
 --batch_size 64 \
---num_per_epoch 100000 \
+--num_per_epoch 500000 \
 --test $test_arg \
 --bleu $bleu_arg \
 --model_dir ./model

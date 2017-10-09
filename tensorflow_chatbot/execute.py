@@ -23,7 +23,12 @@ import random
 import sys
 import time
 
+# NumPy is the fundamental package for scientific computing with Python.
 import numpy as np
+# Six is a Python 2 and 3 compatibility library.
+#  It provides utility functions for smoothing over the differences
+#  between the Python versions with the goal of writing Python code
+#  that is compatible on both Python versions.
 from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
 
@@ -38,7 +43,8 @@ except NameError:
     pass
 else:
     reload(sys).setdefaultencoding('utf-8')
-    
+
+# ConfigParser, read config file modules
 try:
     from ConfigParser import SafeConfigParser
 except:
@@ -129,10 +135,11 @@ def train():
   # Only allocate 2/3 of the gpu memory to allow for running gpu-based predictions while training:
   gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=0.666)
   config = tf.ConfigProto(gpu_options=gpu_options)
+  # 防止 out of memory
   config.gpu_options.allocator_type = 'BFC'
 
   with tf.Session(config=config) as sess:
-    # Create model.
+     # Create model.
     print("Creating %d layers of %d units." % (gConfig['num_layers'], gConfig['layer_size']))
     model = create_model(sess, False)
 
