@@ -1,8 +1,0 @@
-# get data & unzip
-wget http://www.mpi-sws.org/~cristian/data/cornell_movie_dialogs_corpus.zip
-In workspace root folder, make a new folder named "data".
-
-In the new "data" folder, take all the *.txt files from the Cornell training material and dump them in.
-
-Then you need to run 'prepare_data.py' file.
-
