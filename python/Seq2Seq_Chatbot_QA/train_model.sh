@@ -26,3 +26,6 @@ python3 s2s.py \
 --test $test_arg \
 --bleu $bleu_arg \
 --model_dir ./model
+
+# run in win10
+ python s2s.py --size 512 --num_layers 3 --num_epoch 10 --batch_size 64 --num_per_epoch 500000 --test false --bleu -1 --model_dir ./model
