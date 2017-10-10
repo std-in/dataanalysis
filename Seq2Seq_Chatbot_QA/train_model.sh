@@ -19,10 +19,13 @@ fi
 
 python3 s2s.py \
 --size 1024 \
---num_layers 2 \
---num_epoch 5 \
+--num_layers 3 \
+--num_epoch 10 \
 --batch_size 64 \
 --num_per_epoch 500000 \
 --test $test_arg \
 --bleu $bleu_arg \
 --model_dir ./model
+
+# work in win10
+python s2s.py --size 1024 --num_layers 3 --num_epoch 10 --batch_size 64 --num_per_epoch 500000 --test false --bleu -1 --model_dir ./model
