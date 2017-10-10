@@ -1,5 +1,5 @@
 *.idea*
 *.pyc
 *.iml
-Seq2Seq_Chatbot_QA/bucket_dbs/*
-Seq2Seq_Chatbot_QA/db/*
+python/Seq2Seq_Chatbot_QA/bucket_dbs/*
+python/Seq2Seq_Chatbot_QA/db/*
