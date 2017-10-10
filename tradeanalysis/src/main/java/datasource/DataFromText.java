@@ -35,6 +35,7 @@ public class DataFromText {
                 shareDays.add(new Share(shareFutrues));
             }
         } catch (IOException e){
+            e.printStackTrace();
             System.out.println("The " + lineNum + "rd cannot be casted to Share data");
         } finally {
             if (br != null){

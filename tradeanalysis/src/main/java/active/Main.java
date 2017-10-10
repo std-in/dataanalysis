@@ -18,7 +18,7 @@ import java.util.Random;
 public class Main {
     public static void main(String[] args) throws IOException, ParseException, CloneNotSupportedException{
         int myBalance = 10000;
-        Share[] shareData = new DataFromText("/home/nyh/work/data/601558.txt", true).getData(",");
+        Share[] shareData = new DataFromText("data/601558.txt", true).getData(",");
 
         int SMIn = 0, MMIn = 0, SMMIn = 0;
         int SMOut = 0, MMOut = 0, SMMOut = 0;

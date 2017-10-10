@@ -3,3 +3,5 @@
 *.iml
 python/Seq2Seq_Chatbot_QA/bucket_dbs/*
 python/Seq2Seq_Chatbot_QA/db/*
+logs/
+*target*
