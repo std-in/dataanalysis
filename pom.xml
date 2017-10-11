@@ -11,7 +11,7 @@
     <modules>
         <module>tradeanalysis</module>
         <module>dmlib</module>
-        <module>myblog</module>
+        <module>shareview</module>
     </modules>
 
 
