@@ -5,7 +5,7 @@ import com.my.blog.website.controller.BaseController;
 import com.my.blog.website.dto.MetaDto;
 import com.my.blog.website.dto.Types;
 import com.my.blog.website.exception.TipException;
-import com.my.blog.website.modal.Bo.RestResponseBo;
+import com.my.blog.website.model.Bo.RestResponseBo;
 import com.my.blog.website.service.IMetaService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

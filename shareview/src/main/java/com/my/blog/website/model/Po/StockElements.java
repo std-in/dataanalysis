@@ -1,4 +1,4 @@
-package com.my.blog.website.modal.Po;
+package com.my.blog.website.model.Po;
 
 public class StockElements {
     private String Date;
