@@ -87,7 +87,7 @@ public class IndexController extends BaseController {
     /**
      * 文章页
      *
-     * @param request 请求
+     * @param request 股票页请求
      * @param cid     文章主键
      * @return
      */
