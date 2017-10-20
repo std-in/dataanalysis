@@ -3,14 +3,17 @@ package com.my.blog.website.utils;
 
 import com.github.pagehelper.PageInfo;
 import com.my.blog.website.constant.WebConst;
+import com.my.blog.website.modal.Po.StockElements;
 import com.my.blog.website.modal.Vo.ContentVo;
 import com.vdurmont.emoji.EmojiParser;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -344,4 +347,32 @@ public final class Commons {
         return map;
     }
 
+    /**
+     * 从文件中获取股票相应的数据
+     * @param title 股票代码
+     */
+    public static List<StockElements> getStockTrade(String title) throws IOException {
+        assert null != title;
+        String path = "data/" + title + ".SZ.csv";
+        BufferedReader br = new BufferedReader(new FileReader(path));
+        List<StockElements> stockTrades = new ArrayList<StockElements>();
+        String line = "";
+        while ((line = br.readLine()) != null) {
+            if (line.contains("null")) {
+                continue;
+            }
+            String[] elements = line.split(",");
+            StockElements stockElements = new StockElements();
+            stockTrades.add(stockElements);
+            stockElements.setDate(elements[0]);
+            stockElements.setOpen(Double.parseDouble(elements[1]));
+            stockElements.setHigh(Double.parseDouble(elements[2]));
+            stockElements.setLow(Double.parseDouble(elements[3]));
+            stockElements.setClose(Double.parseDouble(elements[4]));
+            stockElements.setAdjClose(Double.parseDouble(elements[5]));
+            stockElements.setVolume(Integer.parseInt(elements[6]));
+        }
+        br.close();
+        return stockTrades;
+    }
 }
