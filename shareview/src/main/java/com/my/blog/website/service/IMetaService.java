@@ -36,11 +36,11 @@ public interface IMetaService {
 
     /**
      * 保存多个项目
-     * @param cid
+     * @param stockcode
      * @param names
      * @param type
      */
-    void saveMetas(Integer cid, String names, String type);
+    void saveMetas(String stockcode, String names, String type);
 
     /**
      * 保存项目

@@ -168,3 +168,25 @@ CREATE TABLE `t_users` (
 INSERT INTO `t_users` (`uid`, `username`, `password`, `email`, `home_url`, `screen_name`, `created`, `activated`, `logged`, `group_name`)
 VALUES
 	(1, 'admin', 'a66abb5684c45962d887564f08346e8d', '1034683568@qq.com', NULL, 'admin', 1490756162, 0, 0, 'visitor');
+
+CREATE TABLE `stock` (
+  `stockcode` varchar(10)  NOT NULL,
+  `title` varchar(200) DEFAULT NULL ,
+  `slug` varchar(200) DEFAULT NULL ,
+  `created` int(10) unsigned DEFAULT '0' ,
+  `modified` int(10) unsigned DEFAULT '0' ,
+  `content` text COMMENT '内容文字',
+  `author_id` int(10) unsigned DEFAULT '0' ,
+  `type` varchar(16) DEFAULT 'post'  ,
+  `status` varchar(16) DEFAULT 'publish' ,
+  `tags` varchar(200) DEFAULT NULL ,
+  `categories` varchar(200) DEFAULT NULL ,
+  `hits` int(10) unsigned DEFAULT '0' ,
+  `comments_num` int(10) unsigned DEFAULT '0' ,
+  `allow_comment` tinyint(1) DEFAULT '1' ,
+  `allow_ping` tinyint(1) DEFAULT '1' ,
+  `allow_feed` tinyint(1) DEFAULT '1' ,
+  PRIMARY KEY (`stockcode`),
+  UNIQUE KEY `slug` (`slug`),
+  KEY `created` (`created`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

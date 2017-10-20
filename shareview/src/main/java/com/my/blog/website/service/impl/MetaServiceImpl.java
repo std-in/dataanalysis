@@ -137,19 +137,19 @@ public class MetaServiceImpl implements IMetaService {
     }
 
     @Override
-    public void saveMetas(Integer cid, String names, String type) {
-        if (null == cid) {
+    public void saveMetas(String stockcode, String names, String type) {
+        if (null == stockcode) {
             throw new TipException("项目关联id不能为空");
         }
         if (StringUtils.isNotBlank(names) && StringUtils.isNotBlank(type)) {
             String[] nameArr = StringUtils.split(names, ",");
             for (String name : nameArr) {
-                this.saveOrUpdate(cid, name, type);
+                this.saveOrUpdate(stockcode, name, type);
             }
         }
     }
 
-    private void saveOrUpdate(Integer cid, String name, String type) {
+    private void saveOrUpdate(String stockcode, String name, String type) {
         MetaVoExample metaVoExample = new MetaVoExample();
         metaVoExample.createCriteria().andTypeEqualTo(type).andNameEqualTo(name);
         List<MetaVo> metaVos = metaDao.selectByExample(metaVoExample);
@@ -170,10 +170,10 @@ public class MetaServiceImpl implements IMetaService {
             mid = metas.getMid();
         }
         if (mid != 0) {
-            Long count = relationshipService.countById(cid, mid);
+            Long count = relationshipService.countById(stockcode, mid);
             if (count == 0) {
                 RelationshipVoKey relationships = new RelationshipVoKey();
-                relationships.setCid(cid);
+                relationships.setCid(stockcode);
                 relationships.setMid(mid);
                 relationshipService.insertVo(relationships);
             }

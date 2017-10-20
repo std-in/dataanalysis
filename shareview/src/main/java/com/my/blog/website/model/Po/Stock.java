@@ -6,7 +6,7 @@ public class Stock {
     /**
      * post表主键
      */
-    private Integer stockcode;
+    private String stockcode;
 
     /**
      * 内容标题
@@ -90,11 +90,11 @@ public class Stock {
 
     private static final long serialVersionUID = 1L;
 
-    public Integer getStockcode() {
+    public String getStockcode() {
         return stockcode;
     }
 
-    public void setStockcode(Integer stockcode) {
+    public void setStockcode(String stockcode) {
         this.stockcode = stockcode;
     }
 
