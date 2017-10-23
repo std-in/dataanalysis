@@ -8,10 +8,12 @@ import com.my.blog.website.dto.Types;
 import com.my.blog.website.exception.TipException;
 import com.my.blog.website.model.Bo.ArchiveBo;
 import com.my.blog.website.model.Bo.RestResponseBo;
+import com.my.blog.website.model.Po.StockElements;
 import com.my.blog.website.model.Vo.CommentVo;
 import com.my.blog.website.model.Vo.MetaVo;
 import com.my.blog.website.service.IMetaService;
 import com.my.blog.website.service.ISiteService;
+import com.my.blog.website.utils.Commons;
 import com.my.blog.website.utils.PatternKit;
 import com.my.blog.website.utils.TaleUtils;
 import com.vdurmont.emoji.EmojiParser;
@@ -32,6 +34,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.List;
 
@@ -92,13 +95,15 @@ public class IndexController extends BaseController {
      * @return
      */
     @GetMapping(value = {"article/{cid}", "article/{cid}.html"})
-    public String getArticle(HttpServletRequest request, @PathVariable String cid) {
+    public String getArticle(HttpServletRequest request, @PathVariable String cid) throws IOException {
         ContentVo contents = contentService.getContents(cid);
         if (null == contents || "draft".equals(contents.getStatus())) {
             return this.render_404();
         }
+        List<StockElements> tradeData = Commons.getStockTrade(contents.getTitle(), true);
         request.setAttribute("article", contents);
         request.setAttribute("is_post", true);
+        request.setAttribute("trades", tradeData);
         completeArticle(request, contents);
         updateArticleHit(contents.getCid(), contents.getHits());
         return this.render("post");

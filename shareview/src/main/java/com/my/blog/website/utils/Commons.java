@@ -3,8 +3,8 @@ package com.my.blog.website.utils;
 
 import com.github.pagehelper.PageInfo;
 import com.my.blog.website.constant.WebConst;
-import com.my.blog.website.modal.Po.StockElements;
-import com.my.blog.website.modal.Vo.ContentVo;
+import com.my.blog.website.model.Po.StockElements;
+import com.my.blog.website.model.Vo.ContentVo;
 import com.vdurmont.emoji.EmojiParser;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -351,12 +351,12 @@ public final class Commons {
      * 从文件中获取股票相应的数据
      * @param title 股票代码
      */
-    public static List<StockElements> getStockTrade(String title) throws IOException {
+    public static List<StockElements> getStockTrade(String title, boolean header) throws IOException {
         assert null != title;
         String path = "data/" + title + ".SZ.csv";
         BufferedReader br = new BufferedReader(new FileReader(path));
         List<StockElements> stockTrades = new ArrayList<StockElements>();
-        String line = "";
+        String line = header == true ? br.readLine() : "";
         while ((line = br.readLine()) != null) {
             if (line.contains("null")) {
                 continue;
