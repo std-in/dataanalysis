@@ -103,7 +103,8 @@ public class IndexController extends BaseController {
         List<StockElements> tradeData = Commons.getStockTrade(contents.getTitle(), true);
         request.setAttribute("article", contents);
         request.setAttribute("is_post", true);
-        request.setAttribute("trades", tradeData);
+        String trade = Commons.convetTodata(tradeData);
+        request.setAttribute("trades", trade);
         completeArticle(request, contents);
         updateArticleHit(contents.getCid(), contents.getHits());
         return this.render("post");

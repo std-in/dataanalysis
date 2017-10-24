@@ -375,4 +375,23 @@ public final class Commons {
         br.close();
         return stockTrades;
     }
+
+    /**
+     * 将list<StockElements>转换为[[1,2,3],[2,4,5]]纯数据形式
+     * @param objectList
+     * Date,Open,High,Low,Close,Adj Close,Volume
+     */
+    public static String convetTodata(List<StockElements> objectList) {
+        String result = "[[";
+        for(StockElements stock: objectList) {
+            result += stock.getDate();
+            result += stock.getOpen();
+            result += stock.getHigh();
+            result += stock.getLow();
+            result += stock.getClose();
+            result += stock.getAdjClose();
+            result += stock.getVolume();
+        }
+        return result + "]]";
+    }
 }
