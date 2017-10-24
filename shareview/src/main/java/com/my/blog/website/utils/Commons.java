@@ -381,17 +381,33 @@ public final class Commons {
      * @param objectList
      * Date,Open,High,Low,Close,Adj Close,Volume
      */
-    public static String convetTodata(List<StockElements> objectList) {
-        String result = "[[";
+    public static List<List<String>> convetTodata(List<StockElements> objectList) {
+        /*String result = "[";
         for(StockElements stock: objectList) {
-            result += stock.getDate();
-            result += stock.getOpen();
-            result += stock.getHigh();
-            result += stock.getLow();
-            result += stock.getClose();
-            result += stock.getAdjClose();
-            result += stock.getVolume();
+            result += "[";
+            result += stock.getDate() + ",";
+            result += stock.getOpen() + ",";
+            result += stock.getHigh() + ",";
+            result += stock.getLow() + ",";
+            result += stock.getClose() + ",";
+            result += stock.getAdjClose() + ",";
+            result += stock.getVolume() + ",";
+            result += "-],";
         }
-        return result + "]]";
+        result += "['','','','','','',''],['','','','','','','']";
+        return result + "]";*/
+        List<List<String>> result = new ArrayList<List<String>>();
+        for(StockElements stock: objectList) {
+            List<String> tmp = new ArrayList<>();
+            result.add(tmp);
+            tmp.add(stock.getDate());
+            tmp.add(stock.getOpen()+"");
+            tmp.add(stock.getHigh()+"");
+            tmp.add(stock.getLow()+"");
+            tmp.add(stock.getClose()+"");
+            tmp.add(stock.getAdjClose()+"");
+            tmp.add(stock.getVolume()+"");
+        }
+        return result;
     }
 }
