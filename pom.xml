@@ -11,7 +11,7 @@
     <modules>
         <module>tradeanalysis</module>
         <module>dmlib</module>
-        <module>shareview</module>
+        <module>stockview</module>
     </modules>
 
 

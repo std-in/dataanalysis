@@ -1,4 +1,4 @@
-package com.jdtms.example.demo.genetic;
+package nyh.optimization;
 
 /**
  * \* Created with IntelliJ IDEA.

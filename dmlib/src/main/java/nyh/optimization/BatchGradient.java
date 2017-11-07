@@ -18,11 +18,11 @@ public class BatchGradient {
                     h = h + inputDataMatrix[j][k] * w[k];
                 }
                 err_sum = expectResult[j] - h;
-                for (int k = 0; k < 2; k++) {
+                for (int k = 0; k < 3; k++) {
                     w[k] = w[k] + learningRate * err_sum * inputDataMatrix[j][k]; // 权值每次改变的幅度，这个公式是通过梯度下降得到的
                 }
             }
-            System.out.println("此时的w权值为：" + "w0:" + w[0] + "---" + "w1:" + w[1]);
+            System.out.println("此时的w权值为：" + "w0:" + w[0] + "---" + "w1:" + w[1] + "---" + "w2:" + w[2]);
             double loss_sum = 0;
             for (int j = 0; j < 4; j++) {
                 double sum = 0;

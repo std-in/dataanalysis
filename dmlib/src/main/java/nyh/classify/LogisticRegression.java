@@ -1,6 +1,7 @@
 package nyh.classify;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,12 +17,12 @@ public class LogisticRegression {
 
 
     public LogisticRegression() throws IOException {//函数作用：初始化，把文件的数据读入程序中
-        BufferedReader br = new BufferedReader(new FileReader("F:/数据挖掘--算法实现/Logistic算法/testSet.txt"));
+        BufferedReader br = new BufferedReader(new FileReader("dmlib/data/iris.index"));
         String line = "";
         List<String> Var = new ArrayList<String>();
         List<String> Tag = new ArrayList<String>();
         while ((line = br.readLine()) != null) {
-            String[] content = line.split(" ");
+            String[] content = line.split(",");
             String tmp = "";
             for (int i = 0; i < content.length - 1; i++) {
                 tmp = tmp + " " + content[i];
@@ -35,6 +36,8 @@ public class LogisticRegression {
             this.Var[i][0] = 1.0f;
             this.Var[i][1] = Float.parseFloat(Var.get(i).split(" ")[0]);
             this.Var[i][2] = Float.parseFloat(Var.get(i).split(" ")[1]);
+            this.Var[i][3] = Float.parseFloat(Var.get(i).split(" ")[2]);
+            this.Var[i][4] = Float.parseFloat(Var.get(i).split(" ")[3]);
             this.Tag[i] = Float.parseFloat(Tag.get(i));
         }
     }
