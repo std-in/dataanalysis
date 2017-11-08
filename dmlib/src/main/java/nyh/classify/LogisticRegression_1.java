@@ -1,7 +1,6 @@
 package nyh.classify;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -10,13 +9,13 @@ import java.util.List;
 /**
  * Created by NYH on 2017/5/19.
  */
-public class LogisticRegression {
+public class LogisticRegression_1 {
     float[] Tag;
     float[][] Var;
     float[] beta;
 
 
-    public LogisticRegression() throws IOException {//函数作用：初始化，把文件的数据读入程序中
+    public LogisticRegression_1() throws IOException {//函数作用：初始化，把文件的数据读入程序中
         BufferedReader br = new BufferedReader(new FileReader("dmlib/data/iris.index"));
         String line = "";
         List<String> Var = new ArrayList<String>();
@@ -67,8 +66,12 @@ public class LogisticRegression {
         return (float) Math.sqrt(tmp);
     }
 
-    public void Logistic_main(float x[][], float y[], float beta[], float a) {//函数作用：梯度下降法求解最大似然函数的最小值点
-        if (Logistic_D_norm(x, y, beta) <= 0.01) {
+    //函数作用：梯度下降法求解最大似然函数的最小值点
+    public void Logistic_main(float x[][], float y[], float beta[], float a) {
+        float error_sum = Logistic_D_norm(x, y, beta);
+        System.out.println("error_sum: " + error_sum);
+//        if (error_sum <= 0.01) {
+        if (error_sum <= 8.7) {
             this.beta = beta;
             return;
         }
@@ -90,7 +93,7 @@ public class LogisticRegression {
     }
 
     public static void main(String[] args) throws IOException {
-        LogisticRegression a = new LogisticRegression();
+        LogisticRegression_1 a = new LogisticRegression_1();
         float[] beta = a.Var[0];
         for (int i = 0; i < beta.length; i++) {
             beta[i] = 0.0f;
