@@ -111,6 +111,7 @@ public class Logistic {
         ArrayList<Double> h = new ArrayList<Double>();
         ArrayList<Integer> dataIndex = new ArrayList<Integer>();
         ArrayList<Double> dataMatrixMulweights = new ArrayList<Double>();
+        // 权值weight weighttmp初始化
         for (int i = 0; i < n; i++) {
             weights.add(1.0);
             weightstmp.add(1.0);
@@ -118,17 +119,17 @@ public class Logistic {
         dataMatrixMulweights.add(0.0);
         double error = 0.0;
         for (int j = 0; j < numberIter; j++) {
-            // 产生0到99的数组
+            // 产生0到299的数组
             for (int p = 0; p < m; p++) {
                 dataIndex.add(p);
             }
             // 进行每一次的训练
-
             for (int i = 0; i < m; i++) {
                 alpha = 4 / (1.0 + i + j) + 0.0001;
                 randIndex = (int) (Math.random() * dataIndex.size());
                 dataIndex.remove(randIndex);
                 double temp = 0.0;
+                //每行的每个元素乘以权值的和
                 for (int k = 0; k < n; k++) {
                     temp = temp + Double.parseDouble(dataSet.data.get(randIndex).get(k)) * weights.get(k);
                 }

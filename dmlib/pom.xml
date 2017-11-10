@@ -11,5 +11,13 @@
 
     <artifactId>dmlib</artifactId>
 
-
+    <!-- 可使用Apache开源库commons math，提供的功能更强大 -->
+    <!-- http://commons.apache.org/proper/commons-math/userguide/fitting.html -->
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+            <version>3.5</version>
+        </dependency>
+    </dependencies>
 </project>
