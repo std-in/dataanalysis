@@ -5,13 +5,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>nyh</groupId>
-    <artifactId>ShareTrade</artifactId>
+    <artifactId>dataanalysis</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>tradeanalysis</module>
         <module>dmlib</module>
         <module>stockview</module>
+        <module>spider</module>
     </modules>
 
 
