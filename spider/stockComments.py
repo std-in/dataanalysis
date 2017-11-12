@@ -49,7 +49,7 @@ if __name__ == '__main__':
     print('\t\t\t\t股票评论下载\n')
     print('作者:nyh\n')
     print('About Me:\n')
-    print('  小白一个')
+    print('  小白一个\n')
     print('*' * 50)
     scs = StockComments('002689')
     scs.getCommentsList()
