@@ -17,6 +17,6 @@ class Comment():
         # 评论标题
         self.comment_title = ''
         # 评论日期
-        self.comment_date = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
+        self.comment_date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
         # 评论内容
-        self.comment_content = {}
+        self.comment_content = []
