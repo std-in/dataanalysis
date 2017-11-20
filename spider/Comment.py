@@ -14,8 +14,6 @@ class Comment():
     def __init__(self, stockcode):
         # 评论股票代码
         self.stock_code = stockcode
-        # 评论标题
-        self.comment_title = ''
         # 评论日期
         self.comment_date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
         # 评论内容

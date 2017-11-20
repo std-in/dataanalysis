@@ -2,6 +2,7 @@
 from Comment import Comment
 import re
 from urllib import request
+import jieba
 
 """
 类说明： 获取东方财富网某一股票的评论信息
@@ -56,20 +57,31 @@ class StockComments():
     """
     def getCommentsContent(self):
         for url in self.child_url:
+            stockcode = url.split(",")[1]
             childurl = self.url_prefix + url
             if childurl in self.read:
                 break
             else:
                 htmlContent = self.getHtml(childurl)
                 # print(htmlContent)
-            # regex = '(\\/news.\\d+,\\d+\\.html)".*?(\\d{2}-\\d{2} \\d{2}:\\d{2})'
-                regex = r'stockcodec">(.*?)</div>'
+                # regex = '(\\/news.\\d+,\\d+\\.html)".*?(\\d{2}-\\d{2} \\d{2}:\\d{2})'
+                # 正则表达式在网页中匹配评论
+                regex = r'发表于 (\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})</div>.*?stockcodec">(.*?)</div>'
                 commentCompile = re.compile(regex, re.IGNORECASE|re.DOTALL)
                 allComment = commentCompile.findall(htmlContent)
-                for content in allComment:
-                    regexChinese = '[A-Za-z0-9\[\`\~\!\@\#\$\^\&\*\(\)\=\|\{\}\'\:\;\'\,\[\]\.\<\>\/\?\~\！\@\#\\\&\*\%]'
-                    contentChinese = re.sub(regexChinese, "", content)
-                    print(contentChinese)
+                for contentInfo in allComment:
+                    time = contentInfo[0]
+                    content = contentInfo[1]
+                    # 正则表达式匹配中文
+                    # regexChinese = '[A-Za-z0-9\[\`\~\!\@\#\$\^\&\*\(\)\=\|\{\}\'\:\;\'\,\[\]\.\<\>\/\?\~\！\@\#\\\&\*\%]'
+                    # contentChinese = re.sub(regexChinese, "", content)
+                    # 正则表达式匹配中文,将得到的中文去掉特殊符号
+                    text=''.join(re.findall(u'[\u4e00-\u9fff]+', content))
+                    # 利用结巴分词
+                    seg_list = jieba.cut(text)  # 默认是精确模式
+                    print(stockcode + "   " + time + "   " + " ".join(seg_list))
+
+
 
 """
 函数说明： 主函数，入口
