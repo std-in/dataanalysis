@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 # 使用jieba 函数  对 sentence 文本进行分词
 def sent2word(sentence):
     # 调用jieba进行分词
-    segList = jieba.cut(sentence)
+    segList = jieba.cut(''.join(re.findall(u'[\u4e00-\u9fff]+', sentence)))
     # 分词后的结果存为segResult 为list类型
     segResult = []
     for w in segList:
@@ -78,9 +78,8 @@ def words():
     senList = readLines2('../data/BosonNLP_sentiment_score.txt')
     senDict = defaultdict()
     for s in senList:
-        if s.split(" ") != 2:
+        if len(s.split(" ")) != 2:
             continue
-        print(s.split(' ')[0] + "====" + s.split(' ')[1])
         senDict[s.split(' ')[0]] = s.split(' ')[1]
     # 否定词
     notList = readLines2('../data/notDict.txt')
@@ -94,9 +93,12 @@ def words():
 
 
 # 见文本文档  根据情感定位  获得句子相关得分
-def classifyWords(wordDict,senDict,notList,degreeDict):
+def classifyWords(wordDict, senDict, notList, degreeDict):
+    # 情感词
     senWord = defaultdict()
+    # 否定词
     notWord = defaultdict()
+    # 程度副词
     degreeWord = defaultdict()
     for word in wordDict.keys():
         if word in senDict.keys() and word not in notList and word not in degreeDict.keys():
@@ -113,9 +115,9 @@ def scoreSent(senWord, notWord, degreeWord, segResult):
     W = 1
     score = 0
     # 存所有情感词的位置的列表
-    senLoc = senWord.keys()
-    notLoc = notWord.keys()
-    degreeLoc = degreeWord.keys()
+    senLoc = list(senWord.keys())
+    notLoc = list(notWord.keys())
+    degreeLoc = list(degreeWord.keys())
     senloc = -1
     # notloc = -1
     # degreeloc = -1
@@ -174,18 +176,21 @@ words_vaule = words()
 for x in filepwd:
     # 读目录下文件的内容
     data = readLines(x)
-    # 对data内容进行分词
-    datafen = sent2word(data[0])
-    # 列表转字典
-    datafen_dist = listToDist(datafen)
-    # 通过classifyWords函数 获取句子的 情感词 否定词 程度副词 相关分值
-    data_1 = classifyWords(datafen_dist, words_vaule[0], words_vaule[1], words_vaule[2])
-    # 通过scoreSent 计算 最后句子得分
-    data_2 = scoreSent(data_1[0], data_1[1], data_1[2], returnsegResult(data[0]))
-    # 将得分保存在score_var 以列表的形式
-    score_var.append(data_2)
-    # 打印句子得分
-    print(data_2)
+    for line in data:
+        # 对data内容进行分词
+        datafen = sent2word(line)
+        # 列表转字典
+        datafen_dist = listToDist(datafen)
+        # 通过classifyWords函数 获取句子的 情感词 否定词 程度副词 相关分值
+        data_1 = classifyWords(datafen_dist, words_vaule[0], words_vaule[1], words_vaule[2])
+        # 通过scoreSent 计算 最后句子得分
+        data_2 = scoreSent(data_1[0], data_1[1], data_1[2], returnsegResult(data[0]))
+        # 将得分保存在score_var 以列表的形式
+        score_var.append(data_2)
+        # 打印句子得分
+        print(line)
+        print(data_2)
+
 # 对所有句子得分进行倒序排列
 score_var.sort(reverse=True)
 # 计算一个index 值 存 1~ 所有句子长度 以便于绘图
@@ -193,8 +198,8 @@ index=[]
 for x in range(0,len(score_var)):
     index.append(x+1)
 # 初始化绘图
-plt=runplt();
+plt=runplt()
 # 带入参数
-plt.plot(index,score_var,'r.')
+plt.plot(index, score_var, 'r.')
 # 显示绘图
-plt.show();
+plt.show()

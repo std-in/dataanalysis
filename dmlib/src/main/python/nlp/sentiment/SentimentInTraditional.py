@@ -11,13 +11,15 @@ def yuchuli(s,m): #导入文本，文本预处理
     wenjian = wenjian['comment'].str.replace('(<.*?>.*?<.*?>)','').str.replace('(<.*?>)','') \
         .str.replace('(@.*?[ :])',' ') #替换无用字符
     wenjian = pd.DataFrame({'comment':wenjian[wenjian != '' ]})
-    wenjian.to_csv('out_'+s, header=False, index=False)
+    # wenjian.to_csv('out_'+s, header=False, index=False)
+    wenjian.to_csv(s, header=False, index=False)
     wenjian['mark'] = m #样本标记
     return wenjian.reset_index()
 
 print(os.getcwd())
-neg = yuchuli('data/data_neg.txt',-1)
-pos = yuchuli('data/data_pos.txt',1)
+print(os.path.abspath("../../../../../data/data_neg.txt"))
+neg = yuchuli('../../../../../data/sentiment/data_neg.txt', -1)
+pos = yuchuli('../../../../../data/sentiment/data_pos.txt', 1)
 
 mydata = pd.concat([neg,pos],ignore_index=True)[['comment','mark']] #结果文件
 #预处理基本结束

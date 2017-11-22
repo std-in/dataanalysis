@@ -15,6 +15,6 @@ class Comment():
         # 评论股票代码
         self.stock_code = stockcode
         # 评论日期
-        self.comment_date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+        self.date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
         # 评论内容
-        self.comment_content = []
+        self.content = []

@@ -79,8 +79,10 @@ class StockComments():
                     text=''.join(re.findall(u'[\u4e00-\u9fff]+', content))
                     # 利用结巴分词
                     seg_list = jieba.cut(text)  # 默认是精确模式
-                    print(stockcode + "   " + time + "   " + " ".join(seg_list))
-
+                    conment = Comment(stockcode)
+                    conment.date = time
+                    conment.content = " ".join(seg_list)
+                    print(conment.stock_code + "   " + conment.date + "   " + conment.content)
 
 
 """
