@@ -40,7 +40,7 @@ def sent2word(sentence):
     Delete stopwords
     """
     segResult = []
-    segList = jieba.cut(sentence)
+    segList = jieba.cut(''.join(re.findall(u'[\u4e00-\u9fff]+', sentence)))
     for w in segList:
         segResult.append(w)
     stopwords = readLines('../data/stop_words.txt')
@@ -124,7 +124,8 @@ filepwd = eachFile("../data/test/")
 sentences = []
 for x in filepwd:
     data = readLines(x)
-    sentences.extend(sent2word(data[0]))
+    for line in data:
+        sentences.extend(sent2word(line))
     # sentences.append(data[0])
 
 model = gensim.models.Word2Vec(sentences, min_count=1)
