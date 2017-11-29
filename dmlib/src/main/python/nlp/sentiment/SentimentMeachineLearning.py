@@ -128,7 +128,7 @@ for x in filepwd:
         sentences.extend(sent2word(line))
     # sentences.append(data[0])
 
-model = gensim.models.Word2Vec(sentences, min_count=1)
+model = gensim.models.Word2Vec(sentences, min_count=0, size = 500)
 # outp1 = 'corpus.model.bin'
 # model.save(outp1)
 

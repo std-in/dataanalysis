@@ -14,7 +14,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class Logistic {
+public class
+Logistic {
 
     public static void main(String[] args) {
         colicTest();

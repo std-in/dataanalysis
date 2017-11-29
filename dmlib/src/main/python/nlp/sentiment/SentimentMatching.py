@@ -50,7 +50,7 @@ def eachFile(filepath):
         child.append(os.path.join('%s/%s' % (filepath, allDir)))
     return child
 
-# 读取 filename路径 的每一行数据 并返回 转换为GBK
+# 读取 filename路径 的每一行数据 并返回
 def readLines(filename):
     fopen = open(filename, 'r', encoding='utf-8')
     data=[]
