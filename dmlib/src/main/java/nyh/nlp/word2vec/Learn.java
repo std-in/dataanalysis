@@ -134,7 +134,7 @@ public class Learn {
      * skip gram 模型训练
      *
      * @param sentence
-     * @param neu1
+     * @param index
      */
     private void skipGram(int index, List<WordNeuron> sentence, int b) {
         // TODO Auto-generated method stub
@@ -376,6 +376,7 @@ public class Learn {
         // TODO Auto-generated method stub
 
         try {
+            System.out.println(new File("").getAbsoluteFile());
             DataOutputStream dataOutputStream = new DataOutputStream(
                     new BufferedOutputStream(new FileOutputStream(file)));
             dataOutputStream.writeInt(wordMap.size());
@@ -388,6 +389,7 @@ public class Learn {
                     dataOutputStream.writeFloat(((Double) d).floatValue());
                 }
             }
+            dataOutputStream.close();
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -438,9 +440,12 @@ public class Learn {
     public static void main(String[] args) throws IOException {
         Learn learn = new Learn();
         long start = System.currentTimeMillis();
-        learn.learnFile(new File("library/xh.txt"));
+//        learn.learnFile(new File("library/xh.txt"));
+        File directory = new File("");//设定为当前文件夹
+        System.out.println(directory.getAbsolutePath());
+        learn.learnFile(new File("dmlib/data/word2vec/swresult_withoutnature.txt"));
         System.out.println("use time " + (System.currentTimeMillis() - start));
-        learn.saveModel(new File("library/javaVector"));
+        learn.saveModel(new File("dmlib/model/javaVector"));
 
     }
 }

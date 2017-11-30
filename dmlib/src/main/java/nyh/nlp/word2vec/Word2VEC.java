@@ -18,12 +18,8 @@ public class Word2VEC {
 
 	public static void main(String[] args) throws IOException {
 
-		// Learn learn = new Learn();
-		// learn.learnFile(new File("library/xh.txt"));
-		// learn.saveModel(new File("library/javaSkip1"));
-
 		Word2VEC vec = new Word2VEC();
-		vec.loadJavaModel("library/javaSkip1");
+		vec.loadJavaModel("dmlib/model/javaVector");
 
 		// System.out.println("中国" + "\t" +
 		// Arrays.toString(vec.getWordVector("中国")));
@@ -34,24 +30,19 @@ public class Word2VEC {
 		// System.out.println("足球" + "\t" +
 		// Arrays.toString(vec.getWordVector("足球")));
 
-		// Word2VEC vec2 = new Word2VEC();
-		// vec2.loadGoogleModel("library/vectors.bin") ;
-		//
-		//
-		String str = "毛泽东";
+
+		String str = "基本路线";
 		long start = System.currentTimeMillis();
+		System.out.println("开始时间: " + start);
 		for (int i = 0; i < 100; i++) {
 			System.out.println(vec.distance(str));
-			;
 		}
-		System.out.println(System.currentTimeMillis() - start);
-
-		System.out.println(System.currentTimeMillis() - start);
+		System.out.println("用时: " + (System.currentTimeMillis() - start));
 		// System.out.println(vec2.distance(str));
 		//
 		//
 		// //男人 国王 女人
-		// System.out.println(vec.analogy("邓小平", "毛泽东思想", "毛泽东"));
+		 System.out.println(vec.analogy("邓小平", "毛泽东思想", "毛泽东"));
 		// System.out.println(vec2.analogy("毛泽东", "毛泽东思想", "邓小平"));
 	}
 

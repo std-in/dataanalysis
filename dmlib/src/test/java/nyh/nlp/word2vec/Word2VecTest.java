@@ -26,10 +26,11 @@ import love.cq.util.IOUtil;
 import love.cq.util.StringUtil;
 
 public class Word2VecTest {
-    private static final File sportCorpusFile = new File("corpus/result.txt");
+    private static final File sportCorpusFile =
+            new File("dmlib/data/word2vec/swresult_withoutnature.txt");
 
     public static void main(String[] args) throws IOException {
-        File[] files = new File("corpus/sport/").listFiles();
+        File[] files = new File("dmlib/data/word2vec").listFiles();
 
         //构建语料
         FileOutputStream fos = new FileOutputStream(sportCorpusFile);
@@ -45,7 +46,7 @@ public class Word2VecTest {
 
         lean.learnFile(sportCorpusFile) ;
 
-        lean.saveModel(new File("model/vector.mod")) ;
+        lean.saveModel(new File("dmlib/model/vector.mod")) ;
 
 
 
@@ -53,9 +54,9 @@ public class Word2VecTest {
 
         Word2VEC w2v = new Word2VEC() ;
 
-        w2v.loadJavaModel("model/vector.mod") ;
+        w2v.loadJavaModel("dmlib/model/vector.mod") ;
 
-        System.out.println(w2v.distance("姚明")); ;
+        System.out.println(w2v.distance("毛泽东")); ;
 
     }
 

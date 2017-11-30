@@ -3,11 +3,13 @@ Word2VEC_java
 来源地址
 git@github.com:NLPchina/Word2VEC_java.git
 word2vec java版本的一个实现
-
+执行步骤
+1 执行learn,进行学习
+2 执行Word2VEC 
+3 测试使用test source中的Word2VecTest
 
 
 有人抱怨没有测试代码。我工作中用到。写了个例子正好发这里。大家领会下精神把
-
 有人抱怨没有语料 https://pan.baidu.com/s/1jIy3YSY 大家用这个吧
 
 
