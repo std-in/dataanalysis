@@ -1,8 +1,9 @@
 #coding=utf-8
-from Comment import Comment
+import jieba
 import re
 from urllib import request
-import jieba
+
+from stock.Comment import Comment
 
 """
 类说明： 获取东方财富网某一股票的评论信息
@@ -21,8 +22,8 @@ class StockComments():
         self.stock_code = stockcode
         # url前缀
         self.url_prefix = 'http://guba.eastmoney.com'
-        # 散户评论入口
-        self.entrance = self.url_prefix + '/list,' + self.stock_code + '.html'
+        # 散户评论入口,使用需要添加page+.html结构
+        self.entrance = self.url_prefix + '/list,' + self.stock_code + '_'
         # 爬取深度
         self.spider_deep = 2
         # 下级页面及创建时间
@@ -42,14 +43,17 @@ class StockComments():
     """
     函数说明： 解析入口页面得到评论链
     """
-    def getCommentsList(self):
-        htmlContent = self.getHtml(self.entrance)
+    def getCommentsList(self, page):
+        self.child_url = []
+        htmlContent = self.getHtml(self.entrance + str(page) + '.html')
+        print("网站爬取入口: " + self.entrance + str(page) + '.html')
         # regex = '(\\/news.\\d+,\\d+\\.html)" title="(.*?)".*?(\\d{2}-\\d{2} \\d{2}:\\d{2})'
         regex = '(\\/news.\\d+,\\d+\\.html)".*?(\\d{2}-\\d{2} \\d{2}:\\d{2})'
         urlCompile = re.compile(regex, re.IGNORECASE|re.DOTALL)
         allInfo = urlCompile.findall(htmlContent)
         for s in allInfo:
-            print(s[0] + "      " + s[1])
+            # 打印评论页面和评论页面的时间
+            # print(s[0] + "      " + s[1])
             self.child_url.append(s[0])
 
     """
@@ -69,6 +73,10 @@ class StockComments():
                 regex = r'发表于 (\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})</div>.*?stockcodec">(.*?)</div>'
                 commentCompile = re.compile(regex, re.IGNORECASE|re.DOTALL)
                 allComment = commentCompile.findall(htmlContent)
+
+                # 临时写入50页-100页面文件,用作训练样本
+                fobj=open('stockcommnets.txt', 'a')
+
                 for contentInfo in allComment:
                     time = contentInfo[0]
                     content = contentInfo[1]
@@ -82,7 +90,11 @@ class StockComments():
                     conment = Comment(stockcode)
                     conment.date = time
                     conment.content = " ".join(seg_list)
-                    print(conment.stock_code + "   " + conment.date + "   " + conment.content)
+                    # 打印股票代码 评论时间  评论内容(已经分好词)
+                    # print(conment.stock_code + "   " + conment.date + "   " + conment.content)
+
+                    fobj.write(conment.content + '\n')
+                fobj.close()
 
 
 """
@@ -96,6 +108,9 @@ if __name__ == '__main__':
     print('  小白一个\n')
     print('*' * 50)
     scs = StockComments('002689')
-    scs.getCommentsList()
-    scs.getCommentsContent()
+    # 爬取的页面数量
+    pageNum = 1000
+    for i in range(50, pageNum):
+        scs.getCommentsList(page = i)
+        scs.getCommentsContent()
     # print(scs.getHtml('http://guba.eastmoney.com/news,002689,727902007.html'))
