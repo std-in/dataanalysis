@@ -2,8 +2,10 @@
 import jieba
 import re
 from urllib import request
-
-from stock.Comment import Comment
+# import sys
+# sys.path.append('/home/nyh/work/workspace/dataanalysis/spider/stock')
+# from stock import Comment
+# import Comment
 
 """
 类说明： 获取东方财富网某一股票的评论信息
@@ -43,18 +45,21 @@ class StockComments():
     """
     函数说明： 解析入口页面得到评论链
     """
-    def getCommentsList(self, page):
-        self.child_url = []
-        htmlContent = self.getHtml(self.entrance + str(page) + '.html')
-        print("网站爬取入口: " + self.entrance + str(page) + '.html')
-        # regex = '(\\/news.\\d+,\\d+\\.html)" title="(.*?)".*?(\\d{2}-\\d{2} \\d{2}:\\d{2})'
-        regex = '(\\/news.\\d+,\\d+\\.html)".*?(\\d{2}-\\d{2} \\d{2}:\\d{2})'
-        urlCompile = re.compile(regex, re.IGNORECASE|re.DOTALL)
-        allInfo = urlCompile.findall(htmlContent)
-        for s in allInfo:
-            # 打印评论页面和评论页面的时间
-            # print(s[0] + "      " + s[1])
-            self.child_url.append(s[0])
+    def getCommentsList(self, pageList):
+        for page in pageList:
+            self.child_url = []
+            htmlContent = self.getHtml(self.entrance + str(page) + '.html')
+            print("网站爬取入口: " + self.entrance + str(page) + '.html')
+            # regex = '(\\/news.\\d+,\\d+\\.html)" title="(.*?)".*?(\\d{2}-\\d{2} \\d{2}:\\d{2})'
+            regex = '(\\/news.\\d+,\\d+\\.html)".*?(\\d{2}-\\d{2} \\d{2}:\\d{2})'
+            urlCompile = re.compile(regex, re.IGNORECASE|re.DOTALL)
+            allInfo = urlCompile.findall(htmlContent)
+            for s in allInfo:
+                # 打印评论页面和评论页面的时间
+                # print(s[0] + "      " + s[1])
+                self.child_url.append(s[0])
+            self.getCommentsContent()
+
 
     """
     函数说明： 打开评论页面，抓取评论
@@ -74,7 +79,7 @@ class StockComments():
                 commentCompile = re.compile(regex, re.IGNORECASE|re.DOTALL)
                 allComment = commentCompile.findall(htmlContent)
 
-                # 临时写入50页-100页面文件,用作训练样本
+                # 临时写入pageList页面文件,用作训练样本
                 fobj=open('stockcommnets.txt', 'a')
 
                 for contentInfo in allComment:
@@ -87,18 +92,20 @@ class StockComments():
                     text=''.join(re.findall(u'[\u4e00-\u9fff]+', content))
                     # 利用结巴分词
                     seg_list = jieba.cut(text)  # 默认是精确模式
-                    conment = Comment(stockcode)
-                    conment.date = time
-                    conment.content = " ".join(seg_list)
+                    content = " ".join(seg_list)
+                    # conment = Comment(stockcode)
+                    # conment.date = time
+                    # conment.content = content
                     # 打印股票代码 评论时间  评论内容(已经分好词)
                     # print(conment.stock_code + "   " + conment.date + "   " + conment.content)
 
-                    fobj.write(conment.content + '\n')
+                    fobj.write(content + '\n')
                 fobj.close()
 
 
 """
 函数说明： 主函数，入口
+参数说明: stockcode股票代码, pageNum要抓取的网页个数
 """
 if __name__ == '__main__':
     print('*' * 50)
@@ -108,9 +115,9 @@ if __name__ == '__main__':
     print('  小白一个\n')
     print('*' * 50)
     scs = StockComments('002689')
+    # scs = StockComments(sys.argv[1])
     # 爬取的页面数量
-    pageNum = 1000
-    for i in range(50, pageNum):
-        scs.getCommentsList(page = i)
-        scs.getCommentsContent()
-    # print(scs.getHtml('http://guba.eastmoney.com/news,002689,727902007.html'))
+
+    scs.getCommentsList(range(10000))
+    # scs.getCommentsList(range(int(sys.argv[2])))
+    # # print(scs.getHtml('http://guba.eastmoney.com/news,002689,727902007.html'))
