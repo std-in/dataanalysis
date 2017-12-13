@@ -2,7 +2,7 @@
 import jieba
 import re
 from urllib import request
-# import sys
+import sys
 # sys.path.append('/home/nyh/work/workspace/dataanalysis/spider/stock')
 # from stock import Comment
 # import Comment
@@ -58,13 +58,13 @@ class StockComments():
                 # 打印评论页面和评论页面的时间
                 # print(s[0] + "      " + s[1])
                 self.child_url.append(s[0])
-            self.getCommentsContent()
+            self.getCommentsContent(self.stock_code + "comments")
 
 
     """
     函数说明： 打开评论页面，抓取评论
     """
-    def getCommentsContent(self):
+    def getCommentsContent(self, output):
         for url in self.child_url:
             stockcode = url.split(",")[1]
             childurl = self.url_prefix + url
@@ -80,7 +80,7 @@ class StockComments():
                 allComment = commentCompile.findall(htmlContent)
 
                 # 临时写入pageList页面文件,用作训练样本
-                fobj=open('stockcommnets.txt', 'a')
+                fobj=open(output, 'a')
 
                 for contentInfo in allComment:
                     time = contentInfo[0]
@@ -90,6 +90,7 @@ class StockComments():
                     # contentChinese = re.sub(regexChinese, "", content)
                     # 正则表达式匹配中文,将得到的中文去掉特殊符号
                     text=''.join(re.findall(u'[\u4e00-\u9fff]+', content))
+                    print(text)
                     # 利用结巴分词
                     seg_list = jieba.cut(text)  # 默认是精确模式
                     content = " ".join(seg_list)
@@ -114,8 +115,8 @@ if __name__ == '__main__':
     print('About Me:\n')
     print('  小白一个\n')
     print('*' * 50)
-    scs = StockComments('002689')
-    # scs = StockComments(sys.argv[1])
+    # scs = StockComments('002689')
+    scs = StockComments(sys.argv[1])
     # 爬取的页面数量
 
     scs.getCommentsList(range(10000))
