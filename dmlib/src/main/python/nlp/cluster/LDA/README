@@ -1,0 +1,4 @@
+GensimLDA.py 使用gensim lda theta全部为0.5,有问题
+lda.py 来自git@github.com:a55509432/python-LDA.git 正常使用
+DiyLDA.py 来自网络 http://blog.csdn.net/yan456jie/article/details/52073723 全部为0.5,有问题
+ldaWithplot.py 来自http://blog.csdn.net/eastmount/article/details/50824215
