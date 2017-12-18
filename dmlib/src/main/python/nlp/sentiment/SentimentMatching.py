@@ -20,12 +20,12 @@ def sent2word(sentence):
         segResult.append(w)
 
     # 调用 readLines 读取停用词
-    stopwords = readLines('../data/stop_words.txt')
+    stopwords = readLines('data/nlp/stopWords.txt')
 
     # 如果是停用词 就不保存到newSent
     newSent = []
     for word in segResult:
-        if word+'\n' in stopwords:
+        if word + '\n' in stopwords:
             continue
         else:
             newSent.append(word)
@@ -50,10 +50,11 @@ def eachFile(filepath):
         child.append(os.path.join('%s/%s' % (filepath, allDir)))
     return child
 
+
 # 读取 filename路径 的每一行数据 并返回
 def readLines(filename):
     fopen = open(filename, 'r', encoding='utf-8')
-    data=[]
+    data = []
     for x in fopen.readlines():
         if x.strip() != '':
             data.append(x.strip())
@@ -64,7 +65,7 @@ def readLines(filename):
 # 读取 filename路径 的每一行数据 并返回
 def readLines2(filename):
     fopen = open(filename, 'r', encoding='utf-8')
-    data=[]
+    data = []
     for x in fopen.readlines():
         if x.strip() != '':
             data.append(x.strip())
@@ -74,17 +75,17 @@ def readLines2(filename):
 
 # 主要为情感定位  见程序文件相关代码 这里是为了速度 提取了部分代码 本来应该在classifyWords 里边  貌似对速度影响不大
 def words():
-    #情感词
-    senList = readLines2('../data/BosonNLP_sentiment_score.txt')
+    # 情感词
+    senList = readLines2('data/nlp/BosonNLP_sentiment_score.txt')
     senDict = defaultdict()
     for s in senList:
         if len(s.split(" ")) != 2:
             continue
         senDict[s.split(' ')[0]] = s.split(' ')[1]
     # 否定词
-    notList = readLines2('../data/notDict.txt')
+    notList = readLines2('data/nlp/no.txt')
     # 程度副词
-    degreeList = readLines2('../data/degreeDict.txt')
+    degreeList = readLines2('data/nlp/plus.txt')
     degreeDict = defaultdict()
     for d in degreeList:
         degreeDict[d] = 1
@@ -148,9 +149,9 @@ def scoreSent(senWord, notWord, degreeWord, segResult):
 
 # 列表 转 字典
 def listToDist(wordlist):
-    data={}
+    data = {}
     for x in range(0, len(wordlist)):
-        data[wordlist[x]]=x
+        data[wordlist[x]] = x
     return data
 
 
@@ -160,15 +161,16 @@ def runplt():
     plt.title('test')
     plt.xlabel('x')
     plt.ylabel('y')
-    #这里定义了  图的长度 比如 2000条数据 就要 写 0,2000  
-    plt.axis([0,1000,-10,10])
+    # 这里定义了  图的长度 比如 2000条数据 就要 写 0,2000
+    plt.axis([0, 1000, -10, 10])
     plt.grid(True)
     return plt
 
 
 # 主题从这里开始 上边全是方法
+os.chdir("/home/nyh/work/workspace/dataanalysis/dmlib/")
 # 获取 test/neg 下所有文件 路径
-filepwd = eachFile("../data/test")
+filepwd = eachFile("data/nlp/test")
 score_var = []
 # 获取本地的情感词 否定词 程度副词
 words_vaule = words()
@@ -194,11 +196,11 @@ for x in filepwd:
 # 对所有句子得分进行倒序排列
 score_var.sort(reverse=True)
 # 计算一个index 值 存 1~ 所有句子长度 以便于绘图
-index=[]
-for x in range(0,len(score_var)):
-    index.append(x+1)
+index = []
+for x in range(0, len(score_var)):
+    index.append(x + 1)
 # 初始化绘图
-plt=runplt()
+plt = runplt()
 # 带入参数
 plt.plot(index, score_var, 'r.')
 # 显示绘图
