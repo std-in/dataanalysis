@@ -116,8 +116,9 @@ class LdaModel:
         for n in range(self.ntopics):
             for i in range(len(self.corpus)):
                 if doc_topic[i].argmax() == n:
-                    file_object.write("label: {} feature: {} \n".format(n,self.corpus[i]))
+                    file_object.write("label: {} feature: {} \n".format(n, self.corpus[i]))
         file_object.close()
+
 
 if __name__ == '__main__':
     # filepath = '/home/nyh/work/workspace/dataanalysis/dmlib/data/news/'
