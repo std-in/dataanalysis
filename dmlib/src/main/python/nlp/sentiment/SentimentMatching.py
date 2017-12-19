@@ -73,7 +73,8 @@ def readLines2(filename):
     return data
 
 
-# 主要为情感定位  见程序文件相关代码 这里是为了速度 提取了部分代码 本来应该在classifyWords 里边  貌似对速度影响不大
+# 主要为情感定位  见程序文件相关代码 这里是为了速度 提取了部分代码
+# 本来应该在classifyWords里边 貌似对速度影响不大
 def words():
     # 情感词
     senList = readLines2('data/nlp/BosonNLP_sentiment_score.txt')

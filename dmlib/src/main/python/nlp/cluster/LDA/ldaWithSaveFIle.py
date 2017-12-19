@@ -151,7 +151,7 @@ class LDAModel(object):
                 f.write('\n')
         # 保存参数设置
         print(u"参数设置已保存到%s" % self.paramfile)
-        with codecs.open(self.paramfile, 'w', 'utf-8') as f:
+        with 1`.open(self.paramfile, 'w', 'utf-8') as f:
             f.write('K=' + str(self.K) + '\n')
             f.write('alpha=' + str(self.alpha) + '\n')
             f.write('beta=' + str(self.beta) + '\n')
