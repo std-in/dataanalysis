@@ -5,7 +5,7 @@ import re
 
 filepath = "/home/nyh/work/workspace/dataanalysis/dmlib/data/news/"
 text = []
-fp = open('/home/nyh/work/workspace/dataanalysis/dmlib/data/nlp/stock/StopWords.txt', 'r')
+fp = open('/home/nyh/work/workspace/dataanalysis/dmlib/data/nlp/stopWords.txt', 'r')
 StopWordsList = [line.strip() for line in fp]
 for filename in os.listdir(filepath):
     file = open(filepath + filename)

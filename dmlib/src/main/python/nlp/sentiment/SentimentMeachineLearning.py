@@ -43,7 +43,7 @@ def sent2word(sentence):
     segList = jieba.cut(''.join(re.findall(u'[\u4e00-\u9fff]+', sentence)))
     for w in segList:
         segResult.append(w)
-    stopwords = readLines('../data/stop_words.txt')
+    stopwords = readLines('/home/nyh/work/workspace/dataanalysis/dmlib/data/nlp/stopWords.txt')
     newSent = []
     stopwords_list = []
     for word in segResult:
@@ -120,7 +120,8 @@ def buildVecs(filename):
 
 # load word2vec model
 # 训练模型输出模型
-filepwd = eachFile("../data/test/")
+os.chdir("/home/nyh/work/workspace/dataanalysis/dmlib/")
+filepwd = eachFile("/home/nyh/work/workspace/dataanalysis/dmlib/data/nlp/test")
 sentences = []
 for x in filepwd:
     data = readLines(x)
