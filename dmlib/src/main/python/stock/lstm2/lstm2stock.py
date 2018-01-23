@@ -85,12 +85,12 @@ def train_lstm(batch_size=80, time_step=15, train_begin=2000, train_end=5800):
         sess.run(tf.global_variables_initializer())
         # saver.restore(sess, module_file)
         # 重复训练10000次
-        for i in range(2000):
+        for i in range(10000):
             for step in range(len(batch_index) - 1):
                 _, loss_ = sess.run([train_op, loss], feed_dict={X: train_x[batch_index[step]:batch_index[step + 1]],
                                                                  Y: train_y[batch_index[step]:batch_index[step + 1]]})
                 print(i, loss_)
-            if i % 200 == 0:
+            if i % 2000 == 0:
                 print("保存模型：", saver.save(sess, 'model/stock2.model', global_step=i))
 
 
