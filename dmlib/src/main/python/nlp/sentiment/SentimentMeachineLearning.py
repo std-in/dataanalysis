@@ -114,7 +114,6 @@ def buildVecs(filename):
                     if len(resultList) != 0:
                         resultArray = sum(np.array(resultList)) / len(resultList)
                         posInput.append(resultArray)
-
     return posInput
 
 
