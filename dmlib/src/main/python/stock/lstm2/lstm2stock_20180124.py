@@ -42,13 +42,13 @@ def get_test_data(input_size, time_step, test_begin, ylabel):
     normalized_test_data = (data_test - mean) / std  # 标准化
     size = (len(normalized_test_data) + time_step - 1) // time_step  # 有size个sample
     test_x, test_y = [], []
-    for i in range(size - 1):
+    for i in range(len(data_test) // time_step):
         x = normalized_test_data[i * time_step:(i + 1) * time_step, :input_size]
-        y = normalized_test_data[i * time_step:(i + 1) * time_step, input_size]
+        y = normalized_test_data[i * time_step:(i + 1) * time_step, ylabel]
         test_x.append(x.tolist())
         test_y.extend(y)
-        test_x.append((normalized_test_data[(i + 1) * time_step:, :input_size]).tolist())
-        test_y.extend((normalized_test_data[(i + 1) * time_step:, input_size]).tolist())
+    test_x.append((normalized_test_data[len(data_test) // time_step:, :input_size]).tolist())
+    test_y.extend((normalized_test_data[len(data_test) // time_step:, ylabel]).tolist())
     return mean, std, test_x, test_y
 
 
@@ -104,7 +104,7 @@ def train_lstm(input_size, batch_size, time_step, train_begin, train_end, iter, 
                                     feed_dict={X: train_x[batch_index[step]:batch_index[step + 1]],
                                                Y: train_y[batch_index[step]:batch_index[step + 1]]})
                 # print(i, loss_)
-            if i % 200 == 0:
+            if i % 2 == 0:
                 print("保存模型：", saver.save(sess, 'model/stock2.model', global_step=i))
 
 
@@ -134,7 +134,7 @@ def prediction(input_size, time_step, test_begin, ylabel):
         plt.show()
 
 
-os.chdir("/home/nyh/work/workspace/dataanalysis/dmlib/")
+os.chdir("/home/nyh/work/github/dataanalysis/dmlib/")
 np.seterr(divide='ignore')
 # ——————————————————定义神经网络变量——————————————————
 # 定义常量
@@ -169,7 +169,7 @@ batch_size = 20
 time_step = 15
 train_begin = 1
 train_end = 400
-iter=201
+iter = 3
 ylabel = 4
 test_begin = 401
 
@@ -181,5 +181,5 @@ data = df.iloc[:, 1:7].values  # 取第3-10列
 train_lstm(input_size = input_size, batch_size=batch_size, time_step=time_step,
            train_begin=train_begin, train_end=train_end, iter=iter, ylabel = ylabel)
 
-prediction(input_size = input_size, time_step = time_step * input_size,
+prediction(input_size = input_size, time_step = time_step,
            test_begin = test_begin, ylabel = ylabel)
