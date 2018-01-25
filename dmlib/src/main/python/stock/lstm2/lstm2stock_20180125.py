@@ -54,12 +54,11 @@ class StockLstm():
     time_step = int
     train_begin = int
     train_end = int
-    iter = int
     ylabel = int
     test_begin = int
 
     def __init__(self, batch_size = 20, time_step = 15,
-                 train_begin = 1, train_end = 400, iter = 3,
+                 train_begin = 1, train_end = 400,
                  ylabel = 4, test_begin = 401):
         self.batch_size = batch_size
         self.time_step = time_step
@@ -84,7 +83,8 @@ class StockLstm():
         # 经常操作的参数为axis，以m * n矩阵举例：axis 不设置值，对 m*n 个数求均值，返回一个实数
         # axis = 0：压缩行，对各列求均值，返回 1* n 矩阵axis =1 ：压缩列，对各行求均值，返回 m *1 矩阵
         # np.std求标准差
-        normalized_train_data = (data_train - np.mean(data_train, axis=0)) / np.std(data_train, axis=0)  # 标准化
+        # normalized_train_data = (data_train - np.mean(data_train, axis=0)) / np.std(data_train, axis=0)  # 标准化
+        normalized_train_data = data_train
         train_x, train_y = [], []  # 训练集
         for i in range(len(normalized_train_data) - time_step):
             if i % batch_size == 0:
@@ -101,7 +101,8 @@ class StockLstm():
         data_test = self.data[test_begin:]
         mean = np.mean(data_test, axis=0)
         std = np.std(data_test, axis=0)
-        normalized_test_data = (data_test - mean) / std  # 标准化
+        # normalized_test_data = (data_test - mean) / std  # 标准化
+        normalized_test_data = data_test
         size = (len(normalized_test_data) + time_step - 1) // time_step  # 有size个sample
         test_x, test_y = [], []
         for i in range(len(data_test) // time_step):
@@ -139,7 +140,7 @@ class StockLstm():
         return pred, final_states
 
     # ——————————————————训练模型——————————————————
-    def train_lstm(self):
+    def train_lstm(self, iter = 3):
         # tf.placeholder(dtype, shape=None, name=None) 此函数可以理解为形参，用于定义过程，在执行的时候再赋具体的值
         # 参数：dtype：数据类型。常用的是tf.float32,tf.float64等数值类型
         # shape：数据形状。默认是None，就是一维值，也可以是多维，比如[2,3], [None, 3]表示列是3，行不定
@@ -159,13 +160,13 @@ class StockLstm():
             sess.run(tf.global_variables_initializer())
             # saver.restore(sess, module_file)
             # 重复训练
-            for i in range(self.iter):
+            for i in range(iter):
                 for step in range(len(batch_index) - 1):
                     _, loss_ = sess.run([train_op, loss],
                                         feed_dict={X: train_x[batch_index[step]:batch_index[step + 1]],
                                                    Y: train_y[batch_index[step]:batch_index[step + 1]]})
                     # print(i, loss_)
-                if i % 2 == 0:
+                if i % (iter //2) == 0:
                     print("保存模型：", saver.save(sess, 'model/stock2.model', global_step=i))
 
     # ————————————————预测模型————————————————————
@@ -184,8 +185,10 @@ class StockLstm():
                 prob = sess.run(pred, feed_dict={X: [test_x[step]]})
                 predict = prob.reshape((-1))
                 test_predict.extend(predict)
-            test_y = np.array(test_y) * std[self.ylabel] + mean[self.ylabel]
-            test_predict = np.array(test_predict) * std[self.ylabel] + mean[self.ylabel]
+            # test_y = np.array(test_y) * std[self.ylabel] + mean[self.ylabel]
+            test_y = np.array(test_y)
+            # test_predict = np.array(test_predict) * std[self.ylabel] + mean[self.ylabel]
+            test_predict = np.array(test_predict)
             acc = np.average(np.abs(test_predict - test_y[:len(test_predict)])
                              / test_y[:len(test_predict)])  # 偏差
             # 以折线图表示结果
@@ -195,11 +198,8 @@ class StockLstm():
             plt.show()
 
     # ————————————————预测模型————————————————————
-    def predictionDay(self):
-        X = tf.placeholder(tf.float32, shape=[None, self.time_step, self.input_size])
-        # Y=tf.placeholder(tf.float32, shape=[None,time_step,output_size])
-        mean, std, test_x, test_y = self.get_test_data(self.input_size, self.time_step,
-                                                       self.test_begin, self.ylabel)
+    def predictionDay(self, test_x, test_y):
+        X = tf.placeholder(tf.float32, shape=[None, self.input_size])
         pred, _ = self.lstm(X)
         saver = tf.train.Saver(tf.global_variables())
         with tf.Session() as sess:
@@ -207,19 +207,10 @@ class StockLstm():
             module_file = tf.train.latest_checkpoint('model')
             saver.restore(sess, module_file)
             test_predict = []
-            for step in range(len(test_x) - 1):
-                prob = sess.run(pred, feed_dict={X: [test_x[step]]})
-                predict = prob.reshape((-1))
-                test_predict.extend(predict)
-            test_y = np.array(test_y) * std[self.ylabel] + mean[self.ylabel]
-            test_predict = np.array(test_predict) * std[self.ylabel] + mean[self.ylabel]
-            acc = np.average(np.abs(test_predict - test_y[:len(test_predict)])
-                             / test_y[:len(test_predict)])  # 偏差
-            # 以折线图表示结果
-            plt.figure()
-            plt.plot(list(range(len(test_predict))), test_predict, color='b')
-            plt.plot(list(range(len(test_y))), test_y, color='r')
-            plt.show()  # os.chdir("/home/nyh/work/github/dataanalysis/dmlib/")
+            prob = sess.run(pred, feed_dict={X: [test_x]})
+            predict = prob.reshape((-1))
+            print("predict :  " + predict)
+            print("true :  " + test_y)
 
 
 if __name__ == '__main__':
@@ -231,8 +222,10 @@ if __name__ == '__main__':
     fetureendindex = 7
     lstmstock = StockLstm()
     lstmstock.get_all_data(filepath, feturebeginindex, fetureendindex)
-    lstmstock.train_lstm()
-    lstmstock.predictionDays()
-
-    # predictionDay()
+    lstmstock.train_lstm(iter=100)
+    # lstmstock.predictionDays()
+    #
+    test_x = lstmstock.data[lstmstock.train_end]
+    test_y = lstmstock.data[lstmstock.train_end][lstmstock.ylabel]
+    lstmstock.predictionDay(test_x = test_x, test_y=test_y)
 
