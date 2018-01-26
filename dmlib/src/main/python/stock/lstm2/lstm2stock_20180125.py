@@ -58,7 +58,7 @@ class StockLstm():
     test_begin = int
 
     def __init__(self, batch_size = 20, time_step = 15,
-                 train_begin = 1, train_end = 400,
+                 train_begin = 1, train_end = 40000,
                  ylabel = 4, test_begin = 401):
         self.batch_size = batch_size
         self.time_step = time_step
@@ -83,8 +83,8 @@ class StockLstm():
         # 经常操作的参数为axis，以m * n矩阵举例：axis 不设置值，对 m*n 个数求均值，返回一个实数
         # axis = 0：压缩行，对各列求均值，返回 1* n 矩阵axis =1 ：压缩列，对各行求均值，返回 m *1 矩阵
         # np.std求标准差
-        # normalized_train_data = (data_train - np.mean(data_train, axis=0)) / np.std(data_train, axis=0)  # 标准化
-        normalized_train_data = data_train
+        normalized_train_data = (data_train - np.mean(data_train, axis=0)) / np.std(data_train, axis=0)  # 标准化
+        # normalized_train_data = data_train
         train_x, train_y = [], []  # 训练集
         for i in range(len(normalized_train_data) - time_step):
             if i % batch_size == 0:
@@ -101,17 +101,21 @@ class StockLstm():
         data_test = self.data[test_begin:]
         mean = np.mean(data_test, axis=0)
         std = np.std(data_test, axis=0)
-        # normalized_test_data = (data_test - mean) / std  # 标准化
-        normalized_test_data = data_test
+        normalized_test_data = (data_test - mean) / std  # 标准化
+        # normalized_test_data = data_test
         size = (len(normalized_test_data) + time_step - 1) // time_step  # 有size个sample
         test_x, test_y = [], []
-        for i in range(len(data_test) // time_step):
-            x = normalized_test_data[i * time_step:(i + 1) * time_step, :input_size]
-            y = normalized_test_data[i * time_step + 1:(i + 1) * time_step + 1, ylabel]
+        for i in range(len(normalized_test_data) - time_step - 1):
+            # x = normalized_test_data[i * time_step:(i + 1) * time_step, :input_size]
+            # y = normalized_test_data[i * time_step + 1:(i + 1) * time_step + 1, ylabel]
+            # test_x.append(x.tolist())
+            # test_y.append(y.tolist)
+            x = normalized_test_data[i:i + time_step, :input_size]
+            y = normalized_test_data[i + 1:i + time_step + 1, ylabel, np.newaxis]
             test_x.append(x.tolist())
-            test_y.extend(y)
-        test_x.append((normalized_test_data[len(data_test) // time_step:len(data_test) - 2, :input_size]).tolist())
-        test_y.extend((normalized_test_data[len(data_test) // time_step + 1:, ylabel]).tolist())
+            test_y.append(y.tolist())
+        # test_x.append((normalized_test_data[len(data_test) // time_step * time_step:len(data_test) - 2, :input_size]).tolist())
+        # test_y.extend((normalized_test_data[len(data_test) // time_step + 1:, ylabel]).tolist())
         return mean, std, test_x, test_y
 
     # ——————————————————定义神经网络变量——————————————————
@@ -160,7 +164,7 @@ class StockLstm():
             sess.run(tf.global_variables_initializer())
             # saver.restore(sess, module_file)
             # 重复训练
-            for i in range(iter):
+            for i in range(1, iter + 2):
                 for step in range(len(batch_index) - 1):
                     _, loss_ = sess.run([train_op, loss],
                                         feed_dict={X: train_x[batch_index[step]:batch_index[step + 1]],
@@ -181,51 +185,64 @@ class StockLstm():
             module_file = tf.train.latest_checkpoint('model')
             saver.restore(sess, module_file)
             test_predict = []
+            test_true = []
             for step in range(len(test_x) - 1):
-                prob = sess.run(pred, feed_dict={X: [test_x[step]]})
+                prob = sess.run(pred, feed_dict={X: [test_x[step]]})[0]
                 predict = prob.reshape((-1))
                 test_predict.extend(predict)
-            # test_y = np.array(test_y) * std[self.ylabel] + mean[self.ylabel]
-            test_y = np.array(test_y)
-            # test_predict = np.array(test_predict) * std[self.ylabel] + mean[self.ylabel]
-            test_predict = np.array(test_predict)
-            acc = np.average(np.abs(test_predict - test_y[:len(test_predict)])
-                             / test_y[:len(test_predict)])  # 偏差
+                test_true.extend(test_y[step][0])
+            # 预测最后time_step个
+            prob = sess.run(pred, feed_dict={X: [test_x[len(test_x) - 1]]})
+            predict = prob.reshape((-1))
+            test_predict.extend(predict)
+            for i in range(self.time_step):
+                test_true.extend(test_y[len(test_y) - 1][i])
+
+            test_true = np.array(test_true) * float(std[self.ylabel]) + mean[self.ylabel]
+            test_predict = np.array(test_predict) * std[self.ylabel] + mean[self.ylabel]
+            acc = np.average(np.abs(test_predict - test_true[:len(test_predict)])
+                             / test_true[:len(test_predict)])  # 偏差
             # 以折线图表示结果
             plt.figure()
             plt.plot(list(range(len(test_predict))), test_predict, color='b')
-            plt.plot(list(range(len(test_y))), test_y, color='r')
+            plt.plot(list(range(len(test_true))), test_true, color='r')
             plt.show()
 
     # ————————————————预测模型————————————————————
-    def predictionDay(self, test_x, test_y):
-        X = tf.placeholder(tf.float32, shape=[None, self.input_size])
+    def predictionDay(self, test_x):
+        X = tf.placeholder(tf.float32, shape=[None, self.time_step, self.input_size])
+        mean = np.mean(test_x, axis=0)
+        std = np.std(test_x, axis=0)
+        normalized_test_data = (test_x - mean) / std  # 标准化
         pred, _ = self.lstm(X)
         saver = tf.train.Saver(tf.global_variables())
         with tf.Session() as sess:
             # 参数恢复
             module_file = tf.train.latest_checkpoint('model')
             saver.restore(sess, module_file)
-            test_predict = []
-            prob = sess.run(pred, feed_dict={X: [test_x]})
+            prob = sess.run(pred, feed_dict={X: [normalized_test_data]})
             predict = prob.reshape((-1))
-            print("predict :  " + predict)
-            print("true :  " + test_y)
+            print("predict :  " + str(predict[self.time_step - 1]
+                                   * std[self.ylabel] + mean[self.ylabel]))
 
 
 if __name__ == '__main__':
     os.chdir("/home/nyh/work/workspace/dataanalysis/dmlib/")
     np.seterr(divide='ignore')
 
+    lstmstock = StockLstm()
     filepath = 'data/stock/000977.SZ.csv'
     feturebeginindex = 1
     fetureendindex = 7
-    lstmstock = StockLstm()
     lstmstock.get_all_data(filepath, feturebeginindex, fetureendindex)
-    lstmstock.train_lstm(iter=100)
-    # lstmstock.predictionDays()
-    #
-    test_x = lstmstock.data[lstmstock.train_end]
-    test_y = lstmstock.data[lstmstock.train_end][lstmstock.ylabel]
-    lstmstock.predictionDay(test_x = test_x, test_y=test_y)
+    train_end = 496
 
+    # ============train============
+    # lstmstock.train_lstm(iter=10000)
+
+    # ============predict===========
+    lstmstock.predictionDays()
+
+    # test_x = lstmstock.data[len(lstmstock.data) - lstmstock.time_step:len(lstmstock.data)]
+    # lstmstock.predictionDay(test_x = test_x)
+    # print("true = " + str(lstmstock.data[lstmstock.train_end + 2][lstmstock.ylabel]))
