@@ -230,19 +230,20 @@ if __name__ == '__main__':
     os.chdir("/home/nyh/work/workspace/dataanalysis/dmlib/")
     np.seterr(divide='ignore')
 
-    lstmstock = StockLstm()
+    ylabel = 1
+    lstmstock = StockLstm(ylabel = ylabel)
     filepath = 'data/stock/000977.SZ.csv'
-    feturebeginindex = 1
+    feturebeginindex = 2
     fetureendindex = 7
     lstmstock.get_all_data(filepath, feturebeginindex, fetureendindex)
     train_end = 496
 
     # ============train============
-    # lstmstock.train_lstm(iter=10000)
+    lstmstock.train_lstm(iter=10000)
 
     # ============predict===========
-    lstmstock.predictionDays()
-
-    # test_x = lstmstock.data[len(lstmstock.data) - lstmstock.time_step:len(lstmstock.data)]
-    # lstmstock.predictionDay(test_x = test_x)
-    # print("true = " + str(lstmstock.data[lstmstock.train_end + 2][lstmstock.ylabel]))
+    # lstmstock.predictionDays()
+    #
+    test_x = lstmstock.data[len(lstmstock.data) - lstmstock.time_step:len(lstmstock.data)]
+    lstmstock.predictionDay(test_x = test_x)
+    # print("true = " + str(lstmstock.data[train_end + 2][lstmstock.ylabel]))
