@@ -1,18 +1,10 @@
 # coding=utf-8
 import tensorflow as tf
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 class TensorflowLstm():
-    batch_size = int
-    time_step = int
-    rnn_unit = int
-    input_size = int
-    output_size = int
-    # learning rate
-    lr = float
-    # 输入层、输出层权重、偏置
-    weights = {}
-    biases = {}
 
     def __init__(self, batch_size=20, time_step=15,rnn_unit=10, input_size = 6, output_size=1, lr = 0.0002):
         self.batch_size = batch_size
@@ -20,7 +12,9 @@ class TensorflowLstm():
         self.rnn_unit = rnn_unit
         self.input_size = input_size
         self.output_size = output_size
+        # learning rate
         self.lr = lr
+        # 输入层、输出层权重、偏置
         self.weights= {
             # tf.Variable定义tensorflow图中的变量.
             # tf.random_normal(shape,mean=0.0,stddev=1.0,dtype=tf.float32,seed=None,name=None)
@@ -71,7 +65,7 @@ class TensorflowLstm():
 
         return pred, final_states
 
-    def fit(self, iteration=3, traindata=object):
+    def fit(self, iteration, traindata):
         # tf.placeholder(dtype, shape=None, name=None) 此函数可以理解为形参，用于定义过程，在执行的时候再赋具体的值
         # 参数：dtype：数据类型。常用的是tf.float32,tf.float64等数值类型
         # shape：数据形状。默认是None，就是一维值，也可以是多维，比如[2,3], [None, 3]表示列是3，行不定
@@ -79,11 +73,11 @@ class TensorflowLstm():
         X = tf.placeholder(tf.float32, shape=[None, self.time_step, self.input_size])
         Y = tf.placeholder(tf.float32, shape=[None, self.time_step, self.output_size])
 
-        pred = self.lstm(X)
+        pred, _ = self.lstm(X)
         # 损失函数
         loss = tf.reduce_mean(tf.square(tf.reshape(pred,[-1]) - tf.reshape(Y, [-1])))
-        train_op = tf.train.AdadeltaOptimizer(self.lr).minimize(loss=loss)
-        saver = tf.train.latest_checkpoint('model/stock')
+        train_op = tf.train.AdamOptimizer(self.lr).minimize(loss=loss)
+        saver = tf.train.Saver(tf.global_variables(), max_to_keep=15)
         with tf.Session() as sess:
             sess.run(tf.global_variables_initializer())
             # saver.restore(sess, module_file)
@@ -91,11 +85,54 @@ class TensorflowLstm():
             for i in range(1, iteration + 2):
                 for step in range(len(traindata.batch_index) - 1):
                     _, loss_ = sess.run([train_op, loss],feed_dict={
-                        X:traindata.X[traindata.batch_index[step]:traindata.batch_index[step + 1]],
-                        Y:traindata.Y[traindata.batch_index[step]:traindata.batch_index[step + 1]]})
+                        X: traindata.X[traindata.batch_index[step]:traindata.batch_index[step + 1]],
+                        Y: traindata.Y[traindata.batch_index[step]:traindata.batch_index[step + 1]]})
 
-                    if i % (iter // 2) == 0:
-                        print("保存模型：", saver.save(sess, 'model/stock/stock.model', global_step=i))
+                if i % (iteration // 2) == 0:
+                    print("保存模型：", saver.save(sess, 'model/stock/stock.model', global_step=i))
+
+    def predict(self, testdata):
+        print('*' * 15 + 'predict' + '*' * 15)
+        X = tf.placeholder(tf.float32, shape=[None, self.time_step, self.input_size])
+        pred, _ = self.lstm(X)
+        saver = tf.train.Saver(tf.global_variables())
+        test_predict = []
+        test_true = []
+        with tf.Session() as sess:
+            module_file = tf.train.latest_checkpoint('model/stock')
+            saver.restore(sess, module_file)
+            for step in range(len(testdata.X) - 1):
+                # prediction has 15 values that contains 14 repeated with prefer prediction,
+                # so take first value as its prediction
+                prob = sess.run(pred, feed_dict={X: [testdata.X[step]]})[0]
+                predict = prob.reshape((-1))
+                test_predict.extend(predict)
+            # 预测最后time_step个
+            prob = sess.run(pred, feed_dict={X: [testdata.X[len(testdata.X) - 1]]})
+            predict = prob.reshape((-1))
+            test_predict.extend(predict)
+
+            for step in range(len(testdata.Y) - 1):
+                test_true.extend(testdata.Y[step][0])
+            for i in range(self.time_step):
+                test_true.extend(testdata.Y[len(testdata.Y) - 1][i])
+
+        if testdata.normalize:
+            test_predict = np.array(test_predict) * testdata.std[testdata.ylabel] + testdata.mean[testdata.ylabel]
+            acc = np.average(np.abs(test_predict[0:len(test_true)] - test_true)
+                             / test_true)  # 偏差
+
+        return test_true, test_predict, acc
+
+    def plot(self, prediction, test_true):
+        # 以折线图表示结果
+        plt.figure()
+        plt.plot(list(range(len(prediction))), prediction, color='b')
+        plt.plot(list(range(len(test_true))), test_true, color='r')
+        plt.show()
+
+
+
 
 
 

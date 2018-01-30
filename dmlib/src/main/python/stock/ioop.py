@@ -12,9 +12,11 @@ def get_all_data(self, filepath, feturebeginindex, fetureendindex):
 def get_train_data(trainfilepath):
     f = open(trainfilepath)
     # 读入股票数据
-    return pd.read_csv(f)
+    df = pd.read_csv(f)
+    return df
 
 
 def get_test_data(testfilepath):
     f = open(testfilepath)
-    return pd.read_csv(f)
+    df = pd.read_csv(f)
+    return df
