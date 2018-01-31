@@ -6,9 +6,8 @@ import matplotlib.pyplot as plt
 
 class TensorflowLstm():
 
-    def __init__(self, batch_size=20, time_step=15,rnn_unit=10, input_size = 6, output_size=1, lr = 0.0002):
+    def __init__(self, batch_size=20,rnn_unit=10, input_size = 6, output_size=1, lr = 0.0002):
         self.batch_size = batch_size
-        self.time_step = time_step
         self.rnn_unit = rnn_unit
         self.input_size = input_size
         self.output_size = output_size
@@ -70,8 +69,8 @@ class TensorflowLstm():
         # 参数：dtype：数据类型。常用的是tf.float32,tf.float64等数值类型
         # shape：数据形状。默认是None，就是一维值，也可以是多维，比如[2,3], [None, 3]表示列是3，行不定
         # name：名称。
-        X = tf.placeholder(tf.float32, shape=[None, self.time_step, self.input_size])
-        Y = tf.placeholder(tf.float32, shape=[None, self.time_step, self.output_size])
+        X = tf.placeholder(tf.float32, shape=[None, traindata.time_step, self.input_size])
+        Y = tf.placeholder(tf.float32, shape=[None, traindata.time_step, self.output_size])
 
         pred, _ = self.lstm(X)
         # 损失函数
@@ -88,12 +87,12 @@ class TensorflowLstm():
                         X: traindata.X[traindata.batch_index[step]:traindata.batch_index[step + 1]],
                         Y: traindata.Y[traindata.batch_index[step]:traindata.batch_index[step + 1]]})
 
-                if i % (iteration // 2) == 0:
+                if (i + 1) % (iteration // 2) == 0:
                     print("保存模型：", saver.save(sess, 'model/stock/stock.model', global_step=i))
 
     def predict(self, testdata):
         print('*' * 15 + 'predict' + '*' * 15)
-        X = tf.placeholder(tf.float32, shape=[None, self.time_step, self.input_size])
+        X = tf.placeholder(tf.float32, shape=[None, testdata.time_step, self.input_size])
         pred, _ = self.lstm(X)
         saver = tf.train.Saver(tf.global_variables())
         test_predict = []
@@ -114,13 +113,14 @@ class TensorflowLstm():
 
             for step in range(len(testdata.Y) - 1):
                 test_true.extend(testdata.Y[step][0])
-            for i in range(self.time_step):
+            for i in range(testdata.time_step):
                 test_true.extend(testdata.Y[len(testdata.Y) - 1][i])
 
         if testdata.normalize:
+            test_true = np.array(test_true) * float(testdata.std[testdata.ylabel]) + testdata.mean[testdata.ylabel]
             test_predict = np.array(test_predict) * testdata.std[testdata.ylabel] + testdata.mean[testdata.ylabel]
-            acc = np.average(np.abs(test_predict[0:len(test_true)] - test_true)
-                             / test_true)  # 偏差
+        acc = np.average(np.abs(np.array(test_predict[0:len(test_true)]) - np.array(test_true))
+                             / np.array(test_true))  # 偏差
 
         return test_true, test_predict, acc
 
