@@ -5,7 +5,7 @@ import numpy as np
 class StockData():
 
     def __init__(self, data, featurebegin=1,featureend=7, ylabel=4, time_step=15,
-                 batch_size=20, T=1, normalize=True, isPercent=False, isTest=False):
+                 batch_size=20, T=1, normalize=True, needPercent=False, isTest=False):
         self.code = str
         self.name = str
         self.time_step = time_step
@@ -23,10 +23,10 @@ class StockData():
         # np.std求标准差
         newdata = data.iloc[:, featurebegin:featureend].values
 
-        if isPercent:
+        if needPercent:
             newdata1 = newdata[1:]
             newdata2 = newdata[0:len(newdata) - 1]
-            newdata = (newdata1 - newdata2) / newdata2 * 10
+            newdata = (newdata1 - newdata2) / newdata2 * 100
 
         self.mean = np.mean(newdata, axis=0)
         self.std = np.std(newdata, axis=0)  # 标准化
