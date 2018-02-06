@@ -11,3 +11,4 @@ dmlib/model/
 *.settings*
 .vscode
 dmlib/data/SogouCS/
+out

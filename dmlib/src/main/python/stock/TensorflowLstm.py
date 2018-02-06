@@ -83,22 +83,23 @@ class TensorflowLstm():
             # 重复训练
             for i in range(1, iteration + 2):
                 for step in range(len(traindata.batch_index) - 1):
-                    _, loss_ = sess.run([train_op, loss],feed_dict={
+                    _, loss_ = sess.run([train_op, loss], feed_dict={
                         X: traindata.X[traindata.batch_index[step]:traindata.batch_index[step + 1]],
                         Y: traindata.Y[traindata.batch_index[step]:traindata.batch_index[step + 1]]})
 
                 if (i + 1) % (iteration // 2) == 0:
-                    print("保存模型：", saver.save(sess, 'model/stock/stock.model', global_step=i))
+                    # saver.save(sess, 'model/stock/' + traindata.code + '/stock.model', global_step=i)
+                    print("保存模型：", saver.save(sess, 'model/stock/' + traindata.code + '/stock.model', global_step=i))
 
     def predict(self, testdata):
-        print('*' * 15 + 'predict' + '*' * 15)
+        print('*' * 15 + testdata.code +'-predict begin' + '*' * 15)
         X = tf.placeholder(tf.float32, shape=[None, testdata.time_step, self.input_size])
         pred, _ = self.lstm(X)
         saver = tf.train.Saver(tf.global_variables())
         test_predict = []
         test_true = []
         with tf.Session() as sess:
-            module_file = tf.train.latest_checkpoint('model/stock')
+            module_file = tf.train.latest_checkpoint('model/stock/' + testdata.code)
             saver.restore(sess, module_file)
             for step in range(len(testdata.X) - 1):
                 # prediction has 15 values that contains 14 repeated with prefer prediction,
@@ -116,13 +117,24 @@ class TensorflowLstm():
             for i in range(testdata.time_step):
                 test_true.extend(testdata.Y[len(testdata.Y) - 1][i])
 
+        # test_true = testdata.rawdata[1: len(testdata.rawdata) - tab, testdata.ylabel]
         if testdata.normalize:
-            test_true = np.array(test_true) * float(testdata.std[testdata.ylabel]) + testdata.mean[testdata.ylabel]
             test_predict = np.array(test_predict) * testdata.std[testdata.ylabel] + testdata.mean[testdata.ylabel]
+            test_true = np.array(test_true) * testdata.std[testdata.ylabel] + testdata.mean[testdata.ylabel]
+            ud_test_predict = test_predict
+            ud_test_true = test_true
+        if testdata.needPercent:
+            test_predict = testdata.rawdata[0: len(testdata.rawdata) - 1, testdata.ylabel]\
+                           + testdata.rawdata[0: len(testdata.rawdata) - 1, testdata.ylabel]\
+                             * test_predict
+            test_true = testdata.rawdata[testdata.T: len(testdata.rawdata) - 1, testdata.ylabel] \
+                           + testdata.rawdata[testdata.T: len(testdata.rawdata) - 1, testdata.ylabel]\
+                             * test_true
         acc = np.average(np.abs(np.array(test_predict[0:len(test_true)]) - np.array(test_true))
                              / np.array(test_true))  # 偏差
 
-        return test_true, test_predict, acc
+        print('*' * 15 + testdata.code + '-predict end' + '*' * 15)
+        return test_true, test_predict, acc, ud_test_predict, ud_test_true
 
     def plot(self, prediction, test_true):
         # 以折线图表示结果
