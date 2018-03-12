@@ -18,5 +18,7 @@
             <artifactId>spark-mllib_2.11</artifactId>
             <version>2.3.0</version>
         </dependency>
+
     </dependencies>
+
 </project>
