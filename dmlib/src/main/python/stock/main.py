@@ -58,7 +58,7 @@ def scan(stockcode, T=2):
     traindata = StockData(code=stockcode, data=data1,
                           featureend=inputsize,
                           time_step=time_step, normalize=True, needPercent=True, T=T)
-    model.fit(iteration=200, traindata=traindata)
+    model.fit(iteration=10, traindata=traindata)
 
     data2 = ts.get_hist_data(stockcode, start='2017-10-8',
                              end=time.strftime('%Y-%m-%d', time.localtime(time.time())))
@@ -78,8 +78,8 @@ def scan(stockcode, T=2):
                 + " | 预测价格 : | " + str(test_predict[len(test_predict) - (T - i)]))
         f.write('\n')
     f.close()
-    model.plot(test_predict, test_true)
-    model.plot(ud_test_predict, ud_test_true)
+    model.plot(testdata.time, test_predict, test_true)
+    model.plot(testdata.time, ud_test_predict, ud_test_true)
 
 
     # T = 2 normalize=False, isPercent=True, time_step = 15
@@ -107,8 +107,8 @@ if __name__ == '__main__':
     #     tf.reset_default_graph()
     #     scan(code, T=2)
 
-    scan('000977', T=1)
-    tf.reset_default_graph()
+    # scan('000977', T=1)
+    # tf.reset_default_graph()
     scan('000977', T=2)
-    tf.reset_default_graph()
-    scan('000977', T=3)
+    # tf.reset_default_graph()
+    # scan('000977', T=3)

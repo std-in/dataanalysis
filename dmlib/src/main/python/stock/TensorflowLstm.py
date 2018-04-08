@@ -2,6 +2,7 @@
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 
 
 class TensorflowLstm():
@@ -136,9 +137,10 @@ class TensorflowLstm():
         print('*' * 15 + testdata.code + '-predict end' + '*' * 15)
         return test_true, test_predict, acc, ud_test_predict, ud_test_true
 
-    def plot(self, prediction, test_true):
+    def plot(self, time, prediction, test_true):
         # 以折线图表示结果
         plt.figure()
+        # plt.xticks(pd.date_range(time[0], time[len(time) - 1], periods=10))
         plt.plot(list(range(len(prediction))), prediction, color='b')
         plt.plot(list(range(len(test_true))), test_true, color='r')
         plt.show()
