@@ -29,6 +29,11 @@ import java.util.concurrent.*;
 public class ExecutorTest {
 
     public static void main(String[] args) throws Exception {
+        ExecutorTest executorTest = new ExecutorTest();
+//        executorTest.HeartBeat();
+//        executorTest.ThreadPoolTest();
+//        executorTest.CallableAndFuture();
+        executorTest.CompletionServiceTest();
 
     }
 
@@ -100,7 +105,7 @@ public class ExecutorTest {
             final  int result = i;
             completionService.submit(new Callable() {
                 public Object call() throws Exception {
-                    Thread.sleep(new Random().nextInt(5000));   //让当前线程随机休眠一段时间
+                    Thread.sleep(new Random().nextInt(2000));   //让当前线程随机休眠一段时间
                     return result;
                 }
             });
