@@ -1,4 +1,4 @@
-package nyh.classify;
+package nyh.classify.lr.v1;
 
 import java.util.ArrayList;
 

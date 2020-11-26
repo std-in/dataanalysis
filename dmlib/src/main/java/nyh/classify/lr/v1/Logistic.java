@@ -1,4 +1,4 @@
-package nyh.classify;
+package nyh.classify.lr.v1;
 
 /**
  * \* Created with IntelliJ IDEA.
@@ -8,6 +8,7 @@ package nyh.classify;
  * \* Description:
  * \
  */
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
