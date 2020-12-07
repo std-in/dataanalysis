@@ -12,7 +12,7 @@ public class LrTest {
 //      String fileName = "logisticaps.csv";
 //      boolean isEnd = true;
 //      int size = 12;
-        String fileName = "logistic1.csv";
+        String fileName = "data/classify/horseColicTrainingD.txt";
         boolean isEnd = true;
         int size = 2;
 //      String fileName = "binary.csv"; logisticaps

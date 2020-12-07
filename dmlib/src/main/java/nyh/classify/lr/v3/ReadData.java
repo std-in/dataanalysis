@@ -25,11 +25,11 @@ public class ReadData {
             while((row=br.readLine())!=null){
                 String[] A = row.split(",");
                 double[] x = getDoubleArray(A,isEnd);
-                int label = 0;
+                double label = 0;
                 if(isEnd)
-                    label = Integer.parseInt(A[A.length-1]);
+                    label = Double.parseDouble(A[A.length-1]);
                 else
-                    label = Integer.parseInt(A[0]);
+                    label =  Double.parseDouble(A[0]);
                 data.add(new Instance(label,x));
             }
         } catch (IOException e) {

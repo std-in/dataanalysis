@@ -1,3 +1,7 @@
+/******
+ * from https://blog.csdn.net/qunxingvip/article/details/51535897
+ */
+
 package nyh.classify.lr.v3;
 
 import java.util.List;
@@ -99,7 +103,7 @@ public class Logistic {
 
         for(int i=0;i<data.size();i++){
             Instance instance = data.get(i);
-            int label = instance.label;
+            double label = instance.label;
             double[] x = instance.x;
             for(int j=0;j<x.length;j++){
                 if(max[j] == min[j])
@@ -134,7 +138,7 @@ public class Logistic {
         for(int i=0;i<testData.size();i++){
             Instance instance = testData.get(i);
             double[] x = instance.x;
-            int label = instance.label;
+            double label = instance.label;
             int pred=predict(x);
             if(label == pred)
                 count++;
